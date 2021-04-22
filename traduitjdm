@@ -1,0 +1,167 @@
+#!/usr/bin/python3
+
+import inspect
+import getopt
+import sys
+import os.path
+
+verbose = False
+langue = None
+jeedomDir = "/var/www/html"
+plugin = None
+
+def Verbose(txt):
+    ''' Affichage de message Verbose
+
+    '''
+    if verbose:
+        sys.stderr.write (txt)
+
+
+def Options():
+    '''Traitement de options de la ligne de commande.
+
+    '''
+    global verbose
+    global langue
+    global jeedomDir
+    global plugin
+
+    usage = """
+Usage:
+~~~~~~ 
+    """  + os.path.basename(sys.argv[0]) + """ [-h] [-v] [-j <jeedomDir>] -l <langueCible> plugin
+    
+    Outils pour la traduction de plugin Jeedom
+
+    -h                Affichage de cette aide
+    -v                Un peu de babillage
+    -j <jeedomDir>    Répertoire d'installation de Jeedom ('""" + jeedomDir + """' par défaut)
+    -l <langueCible>  Langue cible de la traduction
+
+"""
+    
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hvj:l:")
+    except getopt.GetoptError as err:
+        print (err)
+        sys.stderr.write(usage)
+        sys.exit(1)
+        
+    for opt, arg in opts:
+
+        if opt == "-h":
+            sys.stderr.write(usage)
+            sys.exit(1)
+
+        if opt == "-j":
+            jeedomDir = arg
+        if jeedomDir.endswith("/"):
+            jeedomDir = jeedomDir[:-1]
+
+        elif opt == "-l":
+            langue = arg
+
+        elif opt == "-v":
+            verbose = True
+
+    plugin = args[0]
+    if plugin is None:
+        sys.stderr.write("Nom du plugin manquant!" + usage)
+        sys.exit(1)
+        
+    if langue is None:
+        sys.stderr.write("\nOption -l manquante!\n" + usage)
+        sys.exit(1)
+        
+        
+def PluginDir():
+    global plugin
+    global jeedomDir
+
+    return jeedomDir + "/plugins/" + plugin
+
+
+
+def GetTextesFromFile(fileName):
+    ''' Lecture d'un fichier code Recherche de texte à traduire
+    
+    '''
+    Verbose ("    " + fileName + "\n")
+    
+    textes = set()
+
+    # On met le contenu du fichier en mémoire
+    try:
+        with (open(fileName, "r")) as f:
+            content = f.read()
+    except Exception as ex:
+        info = inspect.currentframe()
+        print (ex, "( at line" , info.f_lineno , ")")
+        sys.exit(1)
+
+    # Recherche des textes au format {{...}}
+    Verbose ("        Recherche des {{..}}\n")
+    pos = content.find("{{")
+    while pos >= 0:
+        # Retrait deis premiers {{ et de ce qui précède
+        content = content[pos + 2:]
+
+        # On garde ce qui précède le prochains }}
+        pos = content.find("}}")
+        txt = content[:pos]
+        textes.add(txt)
+
+        # retrait du texte
+        content = content[pos:]
+        pos = content.find("{{")
+        
+    # On remet le contenu du fichier en mémoire
+    try:
+        with (open(fileName, "r")) as f:
+            content = f.read()
+    except Exception as ex:
+        info = inspect.currentframe()
+        print (ex, "( at line" , info.f_lineno , ")")
+        sys.exit(1)
+
+    # Recherche des textes au format _(...)
+    if fileName[-4:] == ".php":
+        Verbose ("        Recherche des __(...,__FILE__) \n")
+        pos = content.find("__(")
+        while pos >= 0:
+            # Retrait des premiers __( et de ce qui précède
+            content = content[pos + 3:]
+
+            # On garde ce qui précède le prochains }}
+            pos = content.find(", __FILE__)")
+            txt = content[:pos]
+            textes.add(txt)
+
+            # retrait du texte
+            content = content[pos:]
+            pos = content.find("__(")
+
+    return sorted(textes)
+        
+
+
+def GetTextesFromPlugin():
+    Verbose ("Lecture du code...\n")
+    textesFromPlugin = dict()
+    for root, dirs, files in os.walk(PluginDir()):
+        for dirname in dirs:
+            if dirname[0] == ".":
+                dirs.remove(dirname)
+                
+        for fileName in files:
+            if fileName[-4:] == ".php" or fileName[-3:] == ".js":
+                textes = GetTextesFromFile (root + "/" + fileName)
+                if len(textes) > 0:
+                    key = (root + "/" + fileName)[len(jeedomDir)+1:]
+                    textesFromPlugin[key] = textes
+    print (textesFromPlugin)
+        
+        
+Options()
+GetTextesFromPlugin()
