@@ -4,8 +4,11 @@ import inspect
 import getopt
 import sys
 import os.path
+import re
 
 verbose = False
+debug = False
+backup = False
 langue = None
 jeedomDir = "/var/www/html"
 plugin = None
@@ -19,11 +22,24 @@ def Verbose(txt):
 
 
 
+def Debug(txt):
+    ''' Affichage de message Debug
+
+    '''
+    if debug:
+        sys.stderr.write (txt)
+
+
+
 def Options():
     '''Traitement de options de la ligne de commande.
 
     '''
+
+    # Variables globales modifiées dans cette procédure
     global verbose
+    global debug
+    global backup
     global langue
     global jeedomDir
     global plugin
@@ -31,19 +47,21 @@ def Options():
     usage = """
 Usage:
 ~~~~~~
-    """  + os.path.basename(sys.argv[0]) + """ [-h] [-v] [-j <jeedomDir>] -l <langueCible> plugin
+    """  + os.path.basename(sys.argv[0]) + """ [-h] [-v] [-d] [-b] [-j <jeedomDir>] -l <langueCible> plugin
 
     Outils pour la traduction de plugin Jeedom
 
     -h                Affichage de cette aide
     -v                Un peu de babillage
+    -d                Debug (implique -v)
+    -b                Backup: le fichier existant est renommé avec l'extention ".bck"
     -j <jeedomDir>    Répertoire d'installation de Jeedom ('""" + jeedomDir + """' par défaut)
     -l <langueCible>  Langue cible de la traduction
 
 """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hvj:l:")
+        opts, args = getopt.getopt(sys.argv[1:], "hvdbj:l:")
     except getopt.GetoptError as err:
         print (err)
         sys.stderr.write(usage)
@@ -66,6 +84,13 @@ Usage:
         elif opt == "-v":
             verbose = True
 
+        elif opt == "-d":
+            verbose = True
+            debug = True
+
+        elif opt == "-b":
+            backup = True
+
     plugin = args[0]
     if plugin is None:
         sys.stderr.write("Nom du plugin manquant!" + usage)
@@ -78,9 +103,7 @@ Usage:
 
 
 def PluginDir():
-    global plugin
-    global jeedomDir
-
+    # Le chemin d'accès à la racine du plugin
     return jeedomDir + "/plugins/" + plugin
 
 
@@ -91,6 +114,8 @@ def GetTextesFromFile(fileName):
     '''
     Verbose ("    " + fileName + "\n")
 
+    # Contiendra la liste des textes trouvés dans
+    # le fichier en garantissant l'unicité
     textes = set()
 
     # On met le contenu du fichier en mémoire
@@ -102,11 +127,12 @@ def GetTextesFromFile(fileName):
         print (ex, "( at line" , info.f_lineno , ")")
         sys.exit(1)
 
-    # Recherche des textes au format {{...}}
     Verbose ("        Recherche des {{..}}\n")
+
+    # Recherche du premier {{
     pos = content.find("{{")
     while pos >= 0:
-        # Retrait deis premiers {{ et de ce qui précède
+        # Retrait des premiers {{ et de ce qui précède
         content = content[pos + 2:]
 
         # On garde ce qui précède le prochains }}
@@ -118,31 +144,42 @@ def GetTextesFromFile(fileName):
         content = content[pos:]
         pos = content.find("{{")
 
-    # On remet le contenu du fichier en mémoire
-    try:
-        with (open(fileName, "r")) as f:
-            content = f.read()
-    except Exception as ex:
-        info = inspect.currentframe()
-        print (ex, "( at line" , info.f_lineno , ")")
-        sys.exit(1)
-
-    # Recherche des textes au format _(...)
     if fileName[-4:] == ".php":
+        # On remet le contenu du fichier en mémoire
+        try:
+            with (open(fileName, "r")) as f:
+                content = f.read()
+        except Exception as ex:
+            info = inspect.currentframe()
+            print (ex, "( at line" , info.f_lineno , ")")
+            sys.exit(1)
+
+        # Retrait des éventuels espaces qui entourent __FILE__ 
+        content = re.sub (",\s*__FILE__\s*\)", ",__FILE__)", content)
+
         Verbose ("        Recherche des __(...,__FILE__) \n")
         pos = content.find("__(")
         while pos >= 0:
-            # Retrait des premiers __( et de ce qui précède
+            # Retrait du premier __( et de ce qui précède
             content = content[pos + 3:]
 
-            # On garde ce qui précède le prochains }}
-            pos = content.find(", __FILE__)")
+            # On garde ce qui précède le prochain ,__FILE)
+            pos = content.find(",__FILE__)")
             txt = content[:pos]
+
+            # On enlève les simples ou doubles quotes qui entourent le texte
+            if (txt[0] == "'" and txt [-1] == "'") or (txt[0] == '"' and txt [-1] == '"'):
+                txt = txt[1:-1]
+
             textes.add(txt)
 
-            # retrait du texte
+            # Retrait du prochain __( et de ce qui précède
             content = content[pos:]
             pos = content.find("__(")
+
+    if debug:
+        for txt in sorted(textes):
+            Debug ("           " + txt + "\n")
 
     return sorted(textes)
 
@@ -161,10 +198,52 @@ def GetTextesFromPlugin():
                 textes = GetTextesFromFile (root + "/" + fileName)
                 if len(textes) > 0:
                     key = (root + "/" + fileName)[len(jeedomDir)+1:]
+                    key = key.replace("/", "\/")
                     textesFromPlugin[key] = textes
-    print (textesFromPlugin)
+    return textesFromPlugin
 
 
+
+def WriteTraduction( textes ):
+    Verbose ("Ecriture du fichier de traduction...\n")
+    fileName = PluginDir() + "/core/i18n/" + langue + ".json"
+
+    if backup:
+        Verbose ("    Rotation des fichiers existants...\n")
+        if os.path.exists (fileName + ".bck.5"):
+            os.unlink(fileName + ".bck.5")
+
+        for i in [4,3,2,1]:
+            if os.path.exists (fileName + ".bck." + str(i)):
+                os.rename (fileName + ".bck." + str(i), fileName + ".bck." + str(i+1))
+
+        if os.path.exists (fileName + ".bck"):
+            os.rename (fileName + ".bck" , fileName + ".bck.1")
+
+        if os.path.exists (fileName):
+            os.rename (fileName, fileName + ".bck")
+
+    with open(fileName, "w") as f:
+        firstFile = True
+        f.write("{\n")
+        for file  in textes:
+            if firstFile:
+                f.write('    "' + file + '": {\n')
+                firstFile = False
+            else:
+                f.write(',\n    "' + file + '": {\n')
+
+            firstTxt = True
+            for txt in textes[file]:
+                if firstTxt:
+                    f.write('        "' + txt + '": "' + txt + '"')
+                    firstTxt = False
+                else:
+                    f.write(',\n        "' + txt + '": "' + txt + '"')
+            f.write("\n    }")
+                    
+        f.write("\n}\n")
 
 Options()
-GetTextesFromPlugin()
+textes = GetTextesFromPlugin()
+WriteTraduction(textes);
