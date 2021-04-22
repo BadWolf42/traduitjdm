@@ -18,6 +18,7 @@ def Verbose(txt):
         sys.stderr.write (txt)
 
 
+
 def Options():
     '''Traitement de options de la ligne de commande.
 
@@ -29,9 +30,9 @@ def Options():
 
     usage = """
 Usage:
-~~~~~~ 
+~~~~~~
     """  + os.path.basename(sys.argv[0]) + """ [-h] [-v] [-j <jeedomDir>] -l <langueCible> plugin
-    
+
     Outils pour la traduction de plugin Jeedom
 
     -h                Affichage de cette aide
@@ -40,14 +41,14 @@ Usage:
     -l <langueCible>  Langue cible de la traduction
 
 """
-    
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hvj:l:")
     except getopt.GetoptError as err:
         print (err)
         sys.stderr.write(usage)
         sys.exit(1)
-        
+
     for opt, arg in opts:
 
         if opt == "-h":
@@ -69,12 +70,13 @@ Usage:
     if plugin is None:
         sys.stderr.write("Nom du plugin manquant!" + usage)
         sys.exit(1)
-        
+
     if langue is None:
         sys.stderr.write("\nOption -l manquante!\n" + usage)
         sys.exit(1)
-        
-        
+
+
+
 def PluginDir():
     global plugin
     global jeedomDir
@@ -85,10 +87,10 @@ def PluginDir():
 
 def GetTextesFromFile(fileName):
     ''' Lecture d'un fichier code Recherche de texte à traduire
-    
+
     '''
     Verbose ("    " + fileName + "\n")
-    
+
     textes = set()
 
     # On met le contenu du fichier en mémoire
@@ -115,7 +117,7 @@ def GetTextesFromFile(fileName):
         # retrait du texte
         content = content[pos:]
         pos = content.find("{{")
-        
+
     # On remet le contenu du fichier en mémoire
     try:
         with (open(fileName, "r")) as f:
@@ -143,7 +145,7 @@ def GetTextesFromFile(fileName):
             pos = content.find("__(")
 
     return sorted(textes)
-        
+
 
 
 def GetTextesFromPlugin():
@@ -153,7 +155,7 @@ def GetTextesFromPlugin():
         for dirname in dirs:
             if dirname[0] == ".":
                 dirs.remove(dirname)
-                
+
         for fileName in files:
             if fileName[-4:] == ".php" or fileName[-3:] == ".js":
                 textes = GetTextesFromFile (root + "/" + fileName)
@@ -161,7 +163,8 @@ def GetTextesFromPlugin():
                     key = (root + "/" + fileName)[len(jeedomDir)+1:]
                     textesFromPlugin[key] = textes
     print (textesFromPlugin)
-        
-        
+
+
+
 Options()
 GetTextesFromPlugin()
