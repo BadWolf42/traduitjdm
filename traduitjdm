@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+version = 0.1
+
 import inspect
 import getopt
 import sys
@@ -47,11 +49,12 @@ def Options():
     usage = """
 Usage:
 ~~~~~~
-    """  + os.path.basename(sys.argv[0]) + """ [-h] [-v] [-d] [-b] [-j <jeedomDir>] -l <langueCible> plugin
+    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-v] [-d] [-b] [-j <jeedomDir>] -l <langueCible> plugin
 
     Outils pour la traduction de plugin Jeedom
 
     -h                Affichage de cette aide
+    -V                Affichage de la version
     -v                Un peu de babillage
     -d                Debug (implique -v)
     -b                Backup: le fichier existant est renommé avec l'extention ".bck"
@@ -61,13 +64,17 @@ Usage:
 """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hvdbj:l:")
+        opts, args = getopt.getopt(sys.argv[1:], "Vhvdbj:l:")
     except getopt.GetoptError as err:
         print (err)
         sys.stderr.write(usage)
         sys.exit(1)
 
     for opt, arg in opts:
+
+        if opt == "-V":
+            print ("\n", os.path.basename(sys.argv[0]), "Version:", version , "\n\n")
+            sys.exit(9)
 
         if opt == "-h":
             sys.stderr.write(usage)
