@@ -47,6 +47,6 @@ Usage:
         - `fr_FR.json.bck` est renommé `fr_FR.json.bck.1`   
         - `fr_FR.json` est renommé `fr_FR.json.bck`   
  - *-j \<jeedomDir>*    
-     Répertoire d'installation de jeedom. Les textes à tradtuire seront chercher sous `<jeedoDir>/plugins/<plugin>` et la fichier de traduction sera générer dans `<jeedoDir>/plugins/<plugin>/core/i18n`    
+     Répertoire d'installation de jeedom. Les textes à tradtuire seront recherchés sous `<jeedoDir>/plugins/<plugin>` et la fichier de traduction sera générer dans `<jeedoDir>/plugins/<plugin>/core/i18n`    
   - *-l \<langueCible>*    
-      *fr_FR* pour le Français, *en-US* pour l'anglais... Voir le contenu du répertoire `<jeedoDir>/core/i18n` pour les lengues reconnues par Jeedom.
+      *fr_FR* pour le Français, *en-US* pour l'anglais... Voir le contenu du répertoire `<jeedoDir>/core/i18n` pour les langues reconnues par Jeedom.
