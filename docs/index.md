@@ -18,11 +18,12 @@ Le but de **traduitjdm** est de chercher les occurrences `{{texte à afficher}}`
 ```
 Usage:
 ~~~~~~
-    traduitjdm [-h] [-v] [-d] [-b] [-j <jeedomDir>] -l <langueCible> plugin
+    traduitjdm [-V] [-h] [-v] [-d] [-b] [-j <jeedomDir>] -l <langueCible> plugin
     
     Outils pour la traduction de plugin Jeedom
     
     -h                Affichage de cette aide
+    -V                Affichage de la version
     -v                Un peu de babillage
     -d                Debug (implique -v)
     -b                Backup: le fichier existant est renommé avec l'extention ".bck"
@@ -33,6 +34,8 @@ Usage:
 
 - *-h*  
     Affiche l'aide comme ci-dessus puis interromp l'exécution.
+- *-V*
+    Affiche la version du programme puis interromp l'exécution.
 - *-v*  
     Affiche quelques informations durant l'exécution des programmes.
 - *-d*    
