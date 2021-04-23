@@ -12,7 +12,7 @@ Le but de **traduitjdm** est de chercher les occurrences `{{texte à afficher}}`
 *traduitjdm* cherche les textes à traduire dans les fichiers `*.php` et `*js` du code du plugin et génère un fichier de traduction qui contient la structure nécessaire à la traduction mais dans lequel les texte en français sont traduit en français.
 
 * Les traduction doivent ensuite être faites manuellement en éditant le fichier généré.
-* Le fichier généré écrase tous fichier préexistant. Les traductions effectuées précédemment seront donc perdues. L'option "-b" permet toutefois de créer une sauvegarde des 6 versions précédentes du fichier.
+* Le fichier généré écrase tous fichier préexistant. Les traductions effectuées précédemment seront donc perdues. L'option "-b" permet toutefois de conserver une copie des 6 versions précédentes.
 
 ## Syntaxe de "*traduitjdm*"
 ```
