@@ -12,11 +12,19 @@ class FichierSource(object):
     # --- Les méthodes de static ---
 
     @classmethod
-    def by_path (cls, txt, create=True):
-        if path in cls.__fichiersSource:
-            return cls.__fichier.Source[path]
+    def by_key (cls, key, create=True):
+        if key in cls.__fichiersSource:
+            return cls.__fichiersSource[key]
         if create:
-            return cls(path)
+            return cls(key)
+        return None
+
+    def by_path (cls, txt, create=True):
+        key = key_from_path(path)
+        if key in cls.__fichiersSource:
+            return cls.__fichiersSource[key]
+        if create:
+            return cls(key)
         return None
 
     @classmethod
@@ -31,8 +39,8 @@ class FichierSource(object):
         FichierSource.__jeedomDir = dir
 
     @staticmethod
-    def set_jeedom_dir (dir):
-        FichierSource.__jeedomDir = dir
+    def key_from_path (path):
+        return path.replace(FichierSource.__jeedomDir + "/", "").replace("/", "\/")
 
     # --- Les méthodes d'intance ---
 
@@ -42,15 +50,16 @@ class FichierSource(object):
         return super().__new__(cls)
 
     def __init__ (self, path):
-        FichierSource.__fichiersSource[path] = self
         self.__path = path
+        self.__key = self.key_from_path(path)
+        FichierSource.__fichiersSource[self.__key] = self
         self.__textes = set()
 
     def __del__ (self):
-        del self.__fichiersSource[self.__path]
+        del self.__fichiersSource[self.__key]
 
     def get_key (self):
-        return self.__path.replace(FichierSource.__jeedomDir + "/", "").replace("/", "\/")
+        return self.__key
 
     def search_textes(self):
         Debug ("        Recherche {{..}}\n")

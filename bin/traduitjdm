@@ -7,6 +7,7 @@ import getopt
 import sys
 import os.path
 import texte
+import json
 from fichierSource import FichierSource
 from verbose import *
 
@@ -16,7 +17,7 @@ jeedomDir = "/var/www/html"
 plugin = None
 
 
-def Options():
+def options():
     '''Traitement de options de la ligne de commande.
 
     '''
@@ -104,17 +105,17 @@ Usage:
 
 
 
-def PluginDir():
+def plugin_dir():
     # Le chemin d'accès à la racine du plugin
     return jeedomDir + "/plugins/" + plugin
 
 
 
 
-def GetTextesFromPlugin():
+def get_textes_from_source():
     Verbose ("Lecture du code...\n")
     textesFromPlugin = dict()
-    for root, dirs, files in os.walk(PluginDir()):
+    for root, dirs, files in os.walk(plugin_dir()):
         for dirname in dirs:
             if dirname[0] == ".":
                 dirs.remove(dirname)
@@ -128,9 +129,22 @@ def GetTextesFromPlugin():
 
 
 
-def WriteTraduction( textes ="" ):
+def get_textes_from_precedent():
+    try:
+        with open(plugin_dir() + "/core/i18n/" + langue + ".json") as f:
+            content = f.read()
+    except Exception as ex:
+        Verbose ("Pas de version précédente à lire!\n")
+        return
+
+    Verbose ("Lecture de la version précédente...\n")
+    data = json.loads(content)
+    print (data)
+
+
+def write_traduction( textes ="" ):
     Verbose ("Ecriture du fichier de traduction...\n")
-    fileName = PluginDir() + "/core/i18n/" + langue + ".json"
+    fileName = plugin_dir() + "/core/i18n/" + langue + ".json"
 
     if backup:
         Verbose ("    Rotation des fichiers existants...\n")
@@ -157,7 +171,8 @@ def WriteTraduction( textes ="" ):
 
 
 
-Options()
+options()
 FichierSource.set_jeedom_dir(jeedomDir)
-GetTextesFromPlugin()
-WriteTraduction();
+get_textes_from_source()
+get_textes_from_precedent()
+write_traduction();
