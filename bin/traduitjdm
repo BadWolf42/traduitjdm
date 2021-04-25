@@ -1,36 +1,19 @@
 #!/usr/bin/python3
 
-version = "0.1.1"
+version = "0.2.0"
 
 import inspect
 import getopt
 import sys
 import os.path
-import re
+import texte
+from fichierSource import FichierSource
+from verbose import *
 
-verbose = False
-debug = False
 backup = False
 langue = None
 jeedomDir = "/var/www/html"
 plugin = None
-
-def Verbose(txt):
-    ''' Affichage de message Verbose
-
-    '''
-    if verbose:
-        sys.stderr.write (txt)
-
-
-
-def Debug(txt):
-    ''' Affichage de message Debug
-
-    '''
-    if debug:
-        sys.stderr.write (txt)
-
 
 
 def Options():
@@ -74,7 +57,7 @@ Usage:
 
         if opt == "-V":
             print ("\n", os.path.basename(sys.argv[0]), "Version:", version , "\n\n")
-            sys.exit(9)
+            sys.exit(0)
 
         if opt == "-h":
             sys.stderr.write(usage)
@@ -89,19 +72,19 @@ Usage:
             langue = arg
 
         elif opt == "-v":
-            verbose = True
+            set_verbose(True)
 
         elif opt == "-d":
-            verbose = True
-            debug = True
+            set_verbose(True)
+            set_debug(True)
 
         elif opt == "-b":
             backup = True
 
-    plugin = args[0]
-    if plugin is None:
-        sys.stderr.write("Nom du plugin manquant!" + usage)
+    if len(args) == 0:
+        sys.stderr.write("\nNom du plugin manquant!\n" + usage)
         sys.exit(1)
+    plugin = args[0]
 
     if langue is None:
         sys.stderr.write("\nOption -l manquante!\n" + usage)
@@ -115,82 +98,6 @@ def PluginDir():
 
 
 
-def GetTextesFromFile(fileName):
-    ''' Lecture d'un fichier code Recherche de texte à traduire
-
-    '''
-    Verbose ("    " + fileName + "\n")
-
-    # Contiendra la liste des textes trouvés dans
-    # le fichier en garantissant l'unicité
-    textes = set()
-
-    # On met le contenu du fichier en mémoire
-    try:
-        with (open(fileName, "r")) as f:
-            content = f.read()
-    except Exception as ex:
-        info = inspect.currentframe()
-        print (ex, "( at line" , info.f_lineno , ")")
-        sys.exit(1)
-
-    Verbose ("        Recherche des {{..}}\n")
-
-    # Recherche du premier {{
-    pos = content.find("{{")
-    while pos >= 0:
-        # Retrait des premiers {{ et de ce qui précède
-        content = content[pos + 2:]
-
-        # On garde ce qui précède le prochains }}
-        pos = content.find("}}")
-        txt = content[:pos]
-        textes.add(txt)
-
-        # retrait du texte
-        content = content[pos:]
-        pos = content.find("{{")
-
-    if fileName[-4:] == ".php":
-        # On remet le contenu du fichier en mémoire
-        try:
-            with (open(fileName, "r")) as f:
-                content = f.read()
-        except Exception as ex:
-            info = inspect.currentframe()
-            print (ex, "( at line" , info.f_lineno , ")")
-            sys.exit(1)
-
-        # Retrait des éventuels espaces qui entourent __FILE__ 
-        content = re.sub (",\s*__FILE__\s*\)", ",__FILE__)", content)
-
-        Verbose ("        Recherche des __(...,__FILE__) \n")
-        pos = content.find("__(")
-        while pos >= 0:
-            # Retrait du premier __( et de ce qui précède
-            content = content[pos + 3:]
-
-            # On garde ce qui précède le prochain ,__FILE)
-            pos = content.find(",__FILE__)")
-            txt = content[:pos]
-
-            # On enlève les simples ou doubles quotes qui entourent le texte
-            if (txt[0] == "'" and txt [-1] == "'") or (txt[0] == '"' and txt [-1] == '"'):
-                txt = txt[1:-1]
-
-            textes.add(txt)
-
-            # Retrait du prochain __( et de ce qui précède
-            content = content[pos:]
-            pos = content.find("__(")
-
-    if debug:
-        for txt in sorted(textes):
-            Debug ("           " + txt + "\n")
-
-    return sorted(textes)
-
-
 
 def GetTextesFromPlugin():
     Verbose ("Lecture du code...\n")
@@ -202,16 +109,14 @@ def GetTextesFromPlugin():
 
         for fileName in files:
             if fileName[-4:] == ".php" or fileName[-3:] == ".js":
-                textes = GetTextesFromFile (root + "/" + fileName)
-                if len(textes) > 0:
-                    key = (root + "/" + fileName)[len(jeedomDir)+1:]
-                    key = key.replace("/", "\/")
-                    textesFromPlugin[key] = textes
+                Verbose ("    " + fileName + "...\n")
+                fichier = FichierSource(root + "/" + fileName)
+                fichier.search_textes()
     return textesFromPlugin
 
 
 
-def WriteTraduction( textes ):
+def WriteTraduction( textes ="" ):
     Verbose ("Ecriture du fichier de traduction...\n")
     fileName = PluginDir() + "/core/i18n/" + langue + ".json"
 
@@ -230,27 +135,17 @@ def WriteTraduction( textes ):
         if os.path.exists (fileName):
             os.rename (fileName, fileName + ".bck")
 
-    with open(fileName, "w") as f:
-        firstFile = True
-        f.write("{\n")
-        for file  in textes:
-            if firstFile:
-                f.write('    "' + file + '": {\n')
-                firstFile = False
-            else:
-                f.write(',\n    "' + file + '": {\n')
+    result = "{\n"
+    for fs in FichierSource.get_fichiers_source(True):
+        result += fs.get_traduction('fr_FR')
+    result = result[:-2] + "\n}\n"
 
-            firstTxt = True
-            for txt in textes[file]:
-                if firstTxt:
-                    f.write('        "' + txt + '": "' + txt + '"')
-                    firstTxt = False
-                else:
-                    f.write(',\n        "' + txt + '": "' + txt + '"')
-            f.write("\n    }")
-                    
-        f.write("\n}\n")
+    with open(fileName, "w") as f:
+        f.write(result)
+
+
 
 Options()
-textes = GetTextesFromPlugin()
-WriteTraduction(textes);
+FichierSource.set_jeedom_dir(jeedomDir)
+GetTextesFromPlugin()
+WriteTraduction();
