@@ -3,7 +3,7 @@
 ## v0.2.0 ( )
 
 - Modification de la structure du code
-- Vérification de la langue demandée via l'option *-l <langue>*
+- Vérification de la langue demandée via l'option *-l \<langue>*
 
 ## v0.1.1 (24/04/2021)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.1.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.1.1.zip)
