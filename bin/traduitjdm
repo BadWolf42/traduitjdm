@@ -161,18 +161,19 @@ def write_traduction( textes ="" ):
         if os.path.exists (fileName):
             os.rename (fileName, fileName + ".bck")
 
-    result = "{\n"
-    for fs in FichierSource.get_fichiers_source(True):
-        result += fs.get_traduction('fr_FR')
-    result = result[:-2] + "\n}\n"
+    result = dict()
+    for fs in FichierSource.get_fichiers_source():
+        trad = fs.get_traduction('fr_FR')
+        if trad != None:
+            result[fs.get_key()] = trad
 
     with open(fileName, "w") as f:
-        f.write(result)
+        f.write(json.dumps(result, ensure_ascii=False, sort_keys = True, indent=4).replace("/","\/"))
 
 
 
 options()
 FichierSource.set_jeedom_dir(jeedomDir)
 get_textes_from_source()
-get_textes_from_precedent()
+#get_textes_from_precedent()
 write_traduction();

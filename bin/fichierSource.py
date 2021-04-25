@@ -28,10 +28,8 @@ class FichierSource(object):
         return None
 
     @classmethod
-    def get_fichiers_source (cls, trie=False):
+    def get_fichiers_source (cls):
         fs = cls.__fichiersSource.values()
-        if trie:
-            fs = sorted (fs, key=lambda k: k.get_key() )
         return fs
 
     @staticmethod
@@ -40,7 +38,7 @@ class FichierSource(object):
 
     @staticmethod
     def key_from_path (path):
-        return path.replace(FichierSource.__jeedomDir + "/", "").replace("/", "\/")
+        return path.replace(FichierSource.__jeedomDir + "/", "")
 
     # --- Les méthodes d'intance ---
 
@@ -120,13 +118,12 @@ class FichierSource(object):
 
     def get_traduction (self, langue):
         if (len(self.__textes) == 0):
-            return ""
+            return None
 
-        result = 4 * " " + '"' + self.get_key() + '": {\n'
-        for texte in sorted (self.__textes, key = lambda t: t.get_texte().upper()):
+        result = dict()
+        for texte in self.__textes:
             traduction = texte.get_traduction(langue)
-            result += 8 * " "
-            result += '"' + traduction[0] + '": "' + traduction[1] + '",\n'
-        result = result[:-2] + "\n    },\n"
+            result[traduction[0]] = traduction[1]
+
         return result
 
