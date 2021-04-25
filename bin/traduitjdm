@@ -29,10 +29,12 @@ def Options():
     global jeedomDir
     global plugin
 
+    langues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU", "tr")
+
     usage = """
 Usage:
 ~~~~~~
-    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-v] [-d] [-b] [-j <jeedomDir>] -l <langueCible> plugin
+    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-v] [-d] [-L] [-b] [-j <jeedomDir>] -l <langueCible> plugin
 
     Outils pour la traduction de plugin Jeedom
 
@@ -41,13 +43,14 @@ Usage:
     -v                Un peu de babillage
     -d                Debug (implique -v)
     -b                Backup: le fichier existant est renommé avec l'extention ".bck"
+    -L                Affiche la liste des langues reconnues
     -j <jeedomDir>    Répertoire d'installation de Jeedom ('""" + jeedomDir + """' par défaut)
     -l <langueCible>  Langue cible de la traduction
 
 """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "Vhvdbj:l:")
+        opts, args = getopt.getopt(sys.argv[1:], "VhvdbjL:l:")
     except getopt.GetoptError as err:
         print (err)
         sys.stderr.write(usage)
@@ -59,14 +62,18 @@ Usage:
             print ("\n", os.path.basename(sys.argv[0]), "Version:", version , "\n\n")
             sys.exit(0)
 
-        if opt == "-h":
+        elif opt == "-h":
             sys.stderr.write(usage)
             sys.exit(1)
 
-        if opt == "-j":
+        elif opt == "-j":
             jeedomDir = arg
-        if jeedomDir.endswith("/"):
-            jeedomDir = jeedomDir[:-1]
+            if jeedomDir.endswith("/"):
+                jeedomDir = jeedomDir[:-1]
+
+        elif opt == "-L":
+            sys.stderr.write ("Les langues reconnues sont:\n   " + "\n   ".join(langues) + "\n")
+            sys.exit(1)
 
         elif opt == "-l":
             langue = arg
@@ -84,10 +91,15 @@ Usage:
     if len(args) == 0:
         sys.stderr.write("\nNom du plugin manquant!\n" + usage)
         sys.exit(1)
+    
     plugin = args[0]
 
     if langue is None:
         sys.stderr.write("\nOption -l manquante!\n" + usage)
+        sys.exit(1)
+
+    if not langue in langues:
+        sys.stderr.write ("Les langues reconnues sont:\n   " + "\n   ".join(langues) + "\n")
         sys.exit(1)
 
 
