@@ -1,8 +1,11 @@
 # Release Notes
 
-## v0.2.0 ( )
-[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.2.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.2.0.zip)
+## v0.2.1 (27/04/2021)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.2.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.2.1.zip)
 
+Suppression d'un message de traçage
+
+## v0.2.0 (27/04/2021)
 - Modification de la structure du code.
 - Vérification de la langue demandée via l'option *-l \<langue>*.
 - Les textes traduits précédemment sont conservés.
