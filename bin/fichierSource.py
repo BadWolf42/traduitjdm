@@ -59,6 +59,9 @@ class FichierSource(object):
     def get_key (self):
         return self.__key
 
+    def add_texte(self, txt):
+        self.__textes.add(txt)
+
     def search_textes(self):
         Debug ("        Recherche {{..}}\n")
         try:

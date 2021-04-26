@@ -32,13 +32,21 @@ class Texte(object):
     def __del__ (self):
         del self.__textes[self.__texte]
 
-    def set_traduction (self, langue, texteTraduit):
-        self.__traduction[langue] = texteTraduit
+    def set_traduction (self, langue, texteTraduit, source, fileKey=None):
+        Debug ("langue : " + langue + "\n")
+        Debug ("texteTraduit : " + texteTraduit + "\n")
+        Debug ("source : " + source + "\n")
+        Debug ("fileKey : " + fileKey + "\n\n")
+
+        self.__traduction.setdefault(langue,dict())
+        self.__traduction[langue][source] = texteTraduit
 
     def get_traduction (self, langue):
+        traduction = self.__texte
         if langue in self.__traduction:
-            return (self,__texte, self.__traduction[langue])
-        return (self.__texte, self.__texte)
+            if "precedent" in self.__traduction[langue]:
+                traduction = self.__traduction[langue]["precedent"] 
+        return (self.__texte, traduction)
 
     def get_texte (self):
         return self.__texte

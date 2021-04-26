@@ -9,12 +9,9 @@ Les textes dans les interfaces Jeedom peuvent être affichés en diverses langue
 
 Le but de **traduitjdm** est de chercher les occurrences `{{texte à afficher}}` et `__("texte à afficher",__FILE__)` dans le code d'un plugin et de créer les fichiers de traductions dans `core/i18n`
 
-## Fonctionnalités de la dernière version (v0.1.0)
+Les textes trouvés par **traduitjdm** dans le code source su plugin sont ajoutés au fichier de traduction de la langue choisiei mais avec une *tradruiction* en Français. Les textes trouvés lors s'une exécution prédédentes sont conservés avec leurs traductions.
 
-*traduitjdm* cherche les textes à traduire dans les fichiers `*.php` et `*js` du code du plugin et génère un fichier de traduction qui contient la structure nécessaire à la traduction mais dans lequel les texte en français sont traduit en français.
-
-* Les traduction doivent ensuite être faites manuellement en éditant le fichier généré.
-* Le fichier généré écrase tous fichier préexistant. Les traductions effectuées précédemment seront donc perdues. L'option "-b" permet toutefois de conserver une copie des 6 versions précédentes.
+Après avoir exécuté **traduitjdm**, il faut éditer le fichier de traduction et remplacer les *traductions* en français par de vraies traduction dans la langue cible.
 
 ## Syntaxe de "*traduitjdm*"
 ```

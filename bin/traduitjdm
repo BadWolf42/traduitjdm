@@ -9,6 +9,7 @@ import os.path
 import texte
 import json
 from fichierSource import FichierSource
+from texte import Texte
 from verbose import *
 
 backup = False
@@ -139,7 +140,14 @@ def get_textes_from_precedent():
 
     Verbose ("Lecture de la version précédente...\n")
     data = json.loads(content)
-    print (data)
+
+    for fkey in data:
+        fs = FichierSource.by_key(fkey)
+        for texte in data[fkey]:
+            txt = Texte.by_texte(texte)
+            print ("3333333333 ", data[fkey][texte])
+            txt.set_traduction(langue, data[fkey][texte], "precedent", fkey)
+            fs.add_texte(txt)
 
 
 def write_traduction( textes ="" ):
@@ -175,5 +183,5 @@ def write_traduction( textes ="" ):
 options()
 FichierSource.set_jeedom_dir(jeedomDir)
 get_textes_from_source()
-#get_textes_from_precedent()
+get_textes_from_precedent()
 write_traduction();
