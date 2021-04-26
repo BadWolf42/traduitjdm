@@ -17,18 +17,18 @@ Après avoir exécuté **traduitjdm**, il faut éditer le fichier de traduction 
 ```
 Usage:
 ~~~~~~
-    traduitjdm [-V] [-h] [-v] [-d] [-b] [-j <jeedomDir>] -l <langueCible> plugin
-    
+    traduitjdm [-V] [-h] [-v] [-d] [-L] [-b] [-j <jeedomDir>] -l <langueCible> plugin
+
     Outils pour la traduction de plugin Jeedom
-    
+
     -h                Affichage de cette aide
     -V                Affichage de la version
     -v                Un peu de babillage
     -d                Debug (implique -v)
     -b                Backup: le fichier existant est renommé avec l'extention ".bck"
+    -L                Affiche la liste des langues reconnues
     -j <jeedomDir>    Répertoire d'installation de Jeedom ('/var/www/html' par défaut)
     -l <langueCible>  Langue cible de la traduction
-
 ```
 
 - *-h*  
@@ -48,6 +48,8 @@ Usage:
         - `fr_FR.json.bck.1` est renommé `fr_FR.json.bck.2`   
         - `fr_FR.json.bck` est renommé `fr_FR.json.bck.1`   
         - `fr_FR.json` est renommé `fr_FR.json.bck`   
+ - *-L*
+     Affiche la liste des langues reconnues
  - *-j \<jeedomDir>*    
      Répertoire d'installation de jeedom. Les textes à tradtuire seront recherchés sous `<jeedoDir>/plugins/<plugin>` et la fichier de traduction sera générer dans `<jeedoDir>/plugins/<plugin>/core/i18n`    
   - *-l \<langueCible>*    
