@@ -13,7 +13,7 @@ from texte import Texte
 from verbose import *
 
 backup = False
-langue = None
+langues = None
 jeedomDir = "/var/www/html"
 plugin = None
 
@@ -27,27 +27,27 @@ def options():
     global verbose
     global debug
     global backup
-    global langue
+    global langues
     global jeedomDir
     global plugin
 
-    langues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU", "tr")
+    languesConnues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU", "tr")
 
     usage = """
 Usage:
 ~~~~~~
-    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-v] [-d] [-L] [-b] [-j <jeedomDir>] -l <langueCible> plugin
+    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-v] [-d] [-L] [-b] [-j <jeedomDir>] -l <langue>[,<langue>,...] plugin
 
     Outils pour la traduction de plugin Jeedom
 
-    -h                Affichage de cette aide
-    -V                Affichage de la version
-    -v                Un peu de babillage
-    -d                Debug (implique -v)
-    -b                Backup: le fichier existant est renommé avec l'extention ".bck"
-    -L                Affiche la liste des langues reconnues
-    -j <jeedomDir>    Répertoire d'installation de Jeedom ('""" + jeedomDir + """' par défaut)
-    -l <langueCible>  Langue cible de la traduction
+    -h                          Affichage de cette aide
+    -V                          Affichage de la version
+    -v                          Un peu de babillage
+    -d                          Debug (implique -v)
+    -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
+    -L                          Affiche la liste des langues reconnues
+    -j <jeedomDir>              Répertoire d'installation de Jeedom ('""" + jeedomDir + """' par défaut)
+    -l <langue>[s,.<langue>...] Langue cible de la traduction
 
 """
 
@@ -78,7 +78,7 @@ Usage:
             sys.exit(1)
 
         elif opt == "-l":
-            langue = arg
+            langues = set(arg.split(","))
 
         elif opt == "-v":
             set_verbose(True)
@@ -96,21 +96,19 @@ Usage:
     
     plugin = args[0]
 
-    if langue is None:
+    if langues is None:
         sys.stderr.write("\nOption -l manquante!\n" + usage)
         sys.exit(1)
 
-    if not langue in langues:
-        sys.stderr.write ("Les langues reconnues sont:\n   " + "\n   ".join(langues) + "\n")
-        sys.exit(1)
-
+    for langue in langues:
+        if not langue in langues:
+            sys.stderr.write ("Les langues reconnues sont:\n   " + "\n   ".join(langues) + "\n")
+            sys.exit(1)
 
 
 def plugin_dir():
     # Le chemin d'accès à la racine du plugin
     return jeedomDir + "/plugins/" + plugin
-
-
 
 
 def get_textes_from_source():
@@ -129,53 +127,75 @@ def get_textes_from_source():
     return textesFromPlugin
 
 
-
 def get_textes_from_precedent():
-    try:
-        with open(plugin_dir() + "/core/i18n/" + langue + ".json") as f:
-            content = f.read()
-    except Exception as ex:
-        Verbose ("Pas de version précédente à lire!\n")
-        return
+    Verbose ("Lecture des versions précédantes...\n")
+    for langue in langues:
+        Verbose ("    Langue: " + langue + "...\n")
+        content = None
+        try:
+            with open(plugin_dir() + "/core/i18n/" + langue + ".json") as f:
+                content = f.read()
+        except Exception as ex:
+            Verbose ("        Pas de version précédente à lire!\n")
 
-    Verbose ("Lecture de la version précédente...\n")
-    data = json.loads(content)
+        if content != None:
+            Verbose ("        Lecture de la version précédente...\n")
+            data = json.loads(content)
 
-    for fkey in data:
-        fs = FichierSource.by_key(fkey)
-        for texte in data[fkey]:
-            txt = Texte.by_texte(texte)
-            txt.set_traduction(langue, data[fkey][texte], "precedent", fkey)
-            fs.add_texte(txt)
+            for fkey in data:
+                fs = FichierSource.by_key(fkey)
+                for texte in data[fkey]:
+                    txt = Texte.by_texte(texte)
+                    txt.set_traduction(langue, data[fkey][texte], "precedent", fkey)
+                    fs.add_texte(txt)
 
+
+def get_textes_from_core():
+    Verbose ("Recherche des traductions dansle core...\n")
+    for langue in langues:
+        Verbose ("    Langue: " + langue + "...\n")
+        try:
+            with open( jeedomDir + "/core/i18n/" + langue + ".json") as f:
+                content = f.read()
+        except Exception as ex:
+            Verbose ("        Erreur lors de la lecture de " + langue + ".json!\n")
+
+        data = json.loads(content)
+        for fkey in data:
+            fs = FichierSource.by_key(fkey)
+            for texte in data[fkey]:
+                txt = Texte.by_texte(texte, False)
+                if (txt != None):
+                    txt.set_traduction(langue, data[fkey][texte], "core")
 
 def write_traduction( textes ="" ):
-    Verbose ("Ecriture du fichier de traduction...\n")
-    fileName = plugin_dir() + "/core/i18n/" + langue + ".json"
+    Verbose ("Ecriture du/des fichier(s) de traduction(s)...\n")
+    for langue in langues:
+        Verbose ("    Langue: " + langue + "...\n")
+        fileName = plugin_dir() + "/core/i18n/" + langue + ".json"
 
-    if backup:
-        Verbose ("    Rotation des fichiers existants...\n")
-        if os.path.exists (fileName + ".bck.5"):
-            os.unlink(fileName + ".bck.5")
+        if backup:
+            Verbose ("        Rotation des fichiers existants...\n")
+            if os.path.exists (fileName + ".bck.5"):
+                os.unlink(fileName + ".bck.5")
 
-        for i in [4,3,2,1]:
-            if os.path.exists (fileName + ".bck." + str(i)):
-                os.rename (fileName + ".bck." + str(i), fileName + ".bck." + str(i+1))
+            for i in [4,3,2,1]:
+                if os.path.exists (fileName + ".bck." + str(i)):
+                    os.rename (fileName + ".bck." + str(i), fileName + ".bck." + str(i+1))
 
-        if os.path.exists (fileName + ".bck"):
-            os.rename (fileName + ".bck" , fileName + ".bck.1")
+            if os.path.exists (fileName + ".bck"):
+                os.rename (fileName + ".bck" , fileName + ".bck.1")
 
-        if os.path.exists (fileName):
-            os.rename (fileName, fileName + ".bck")
+            if os.path.exists (fileName):
+                os.rename (fileName, fileName + ".bck")
 
-    result = dict()
-    for fs in FichierSource.get_fichiers_source():
-        trad = fs.get_traduction(langue)
-        if trad != None:
-            result[fs.get_key()] = trad
+        for fs in FichierSource.get_fichiers_source():
+            trad = fs.get_traduction(langue)
+            if trad != None:
+                result[fs.get_key()] = trad
 
-    with open(fileName, "w") as f:
-        f.write(json.dumps(result, ensure_ascii=False, sort_keys = True, indent=4).replace("/","\/"))
+        with open(fileName, "w") as f:
+            f.write(json.dumps(result, ensure_ascii=False, sort_keys = True, indent=4).replace("/","\/"))
 
 
 
@@ -183,4 +203,5 @@ options()
 FichierSource.set_jeedom_dir(jeedomDir)
 get_textes_from_source()
 get_textes_from_precedent()
+get_textes_from_core()
 write_traduction();

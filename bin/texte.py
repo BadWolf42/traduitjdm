@@ -10,10 +10,8 @@ class Texte(object):
     @classmethod
     def by_texte (cls, txt, create=True):
         if txt in cls.__textes:
-            Debug ('            repetition : "' + txt + '"\n')
             return cls.__textes[txt]
         if create:
-            Debug ('            nouveau    : "' + txt + '"\n')
             return cls(txt)
         return None
 
@@ -33,11 +31,6 @@ class Texte(object):
         del self.__textes[self.__texte]
 
     def set_traduction (self, langue, texteTraduit, source, fileKey=None):
-        Debug ("langue : " + langue + "\n")
-        Debug ("texteTraduit : " + texteTraduit + "\n")
-        Debug ("source : " + source + "\n")
-        Debug ("fileKey : " + fileKey + "\n\n")
-
         self.__traduction.setdefault(langue,dict())
         self.__traduction[langue][source] = texteTraduit
 
@@ -46,6 +39,9 @@ class Texte(object):
         if langue in self.__traduction:
             if "precedent" in self.__traduction[langue]:
                 traduction = self.__traduction[langue]["precedent"] 
+            elif "core" in self.__traduction[langue]:
+                print (vars(self))
+                traduction = self.__traduction[langue]["core"] 
         return (self.__texte, traduction)
 
     def get_texte (self):
