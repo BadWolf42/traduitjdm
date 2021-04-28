@@ -189,7 +189,6 @@ def write_traduction( textes ="" ):
             if os.path.exists (fileName):
                 os.rename (fileName, fileName + ".bck")
 
-        result = dict()
         for fs in FichierSource.get_fichiers_source():
             trad = fs.get_traduction(langue)
             if trad != None:
