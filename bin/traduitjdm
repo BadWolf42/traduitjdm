@@ -170,7 +170,7 @@ def write_traduction( textes ="" ):
 
     result = dict()
     for fs in FichierSource.get_fichiers_source():
-        trad = fs.get_traduction('fr_FR')
+        trad = fs.get_traduction(langue)
         if trad != None:
             result[fs.get_key()] = trad
 
