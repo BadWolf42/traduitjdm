@@ -2,6 +2,7 @@
 
 ## v0.2.2 (29/04/2021)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.2.2.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.2.2.zip)
+
 Correction d'un bug
 
 ## v0.2.1 (27/04/2021)
