@@ -4,6 +4,7 @@ from verbose import *
 class Texte(object):
 
     __textes = dict()
+    __priorite = ["precedent", "core"]
 
     # --- Les méthodes de static ---
 
@@ -14,6 +15,14 @@ class Texte(object):
         if create:
             return cls(txt)
         return None
+
+    @classmethod
+    def set_priorite(cls, p):
+        result = []
+        for prio in p.split(",") + cls.__priorite:
+            if not prio in result:
+                result.append(prio)
+        cls.__priorite = result
 
     # --- Les méthodes d'intance ---
 
@@ -37,11 +46,9 @@ class Texte(object):
     def get_traduction (self, langue):
         traduction = self.__texte
         if langue in self.__traduction:
-            if "precedent" in self.__traduction[langue]:
-                traduction = self.__traduction[langue]["precedent"] 
-            elif "core" in self.__traduction[langue]:
-                print (vars(self))
-                traduction = self.__traduction[langue]["core"] 
+            for source in reversed (self.__priorite):
+                if source in self.__traduction[langue]:
+                        traduction = self.__traduction[langue][source]
         return (self.__texte, traduction)
 
     def get_texte (self):
