@@ -23,13 +23,14 @@ Usage:
     -d                Debug (implique -v)
     -b                Backup: le fichier existant est renommé avec l'extention ".bck"
     -L                Affiche la liste des langues reconnues
+    -f core           Priorité aux traductions provenant du core de Jeedom
     -j <jeedomDir>    Répertoire d'installation de Jeedom ('/var/www/html' par défaut)
     -l <langueCible>  Langue cible de la traduction
 ```
 
 - *-h*  
     Affiche l'aide comme ci-dessus puis interromp l'exécution.
-- *-V*
+- *-V*  
     Affiche la version du programme puis interromp l'exécution.
 - *-v*  
     Affiche quelques informations durant l'exécution des programmes.
@@ -44,12 +45,14 @@ Usage:
         - `fr_FR.json.bck.1` est renommé `fr_FR.json.bck.2`   
         - `fr_FR.json.bck` est renommé `fr_FR.json.bck.1`   
         - `fr_FR.json` est renommé `fr_FR.json.bck`   
- - *-L*
-     Affiche la liste des langues reconnues
+ - *-L*  
+    Affiche la liste des langues reconnues
+ - *-f core*  
+    Les traductions trouvées dans le core de Jeedom sont utilisées en priorité
  - *-j \<jeedomDir>*    
-     Répertoire d'installation de jeedom. Les textes à tradtuire seront recherchés sous `<jeedoDir>/plugins/<plugin>` et la fichier de traduction sera générer dans `<jeedoDir>/plugins/<plugin>/core/i18n`    
+    Répertoire d'installation de jeedom. Les textes à tradtuire seront recherchés sous `<jeedoDir>/plugins/<plugin>` et la fichier de traduction sera générer dans `<jeedoDir>/plugins/<plugin>/core/i18n`    
   - *-l \<langueCible>*    
-      *fr_FR* pour le Français, *en-US* pour l'anglais... Voir le contenu du répertoire `<jeedoDir>/core/i18n` pour les langues reconnues par Jeedom.
+    *fr_FR* pour le Français, *en-US* pour l'anglais... Voir le contenu du répertoire `<jeedoDir>/core/i18n` pour les langues reconnues par Jeedom.
 
 ## Principe de fonctionnement
 ### Recherche des texte à traduire
