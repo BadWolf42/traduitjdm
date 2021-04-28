@@ -128,7 +128,7 @@ def get_textes_from_source():
 
 
 def get_textes_from_precedent():
-    Verbose ("lecture des versions précédantes...\n")
+    Verbose ("Lecture des versions précédantes...\n")
     for langue in langues:
         Verbose ("    Langue: " + langue + "...\n")
         content = None
@@ -149,6 +149,24 @@ def get_textes_from_precedent():
                     txt.set_traduction(langue, data[fkey][texte], "precedent", fkey)
                     fs.add_texte(txt)
 
+
+def get_textes_from_core():
+    Verbose ("Recherche des traductions dansle core...\n")
+    for langue in langues:
+        Verbose ("    Langue: " + langue + "...\n")
+        try:
+            with open( jeedomDir + "/core/i18n/" + langue + ".json") as f:
+                content = f.read()
+        except Exception as ex:
+            Verbose ("        Erreur lors de la lecture de " + langue + ".json!\n")
+
+        data = json.loads(content)
+        for fkey in data:
+            fs = FichierSource.by_key(fkey)
+            for texte in data[fkey]:
+                txt = Texte.by_texte(texte, False)
+                if (txt != None):
+                    txt.set_traduction(langue, data[fkey][texte], "core")
 
 def write_traduction( textes ="" ):
     Verbose ("Ecriture du/des fichier(s) de traduction(s)...\n")
@@ -173,7 +191,7 @@ def write_traduction( textes ="" ):
 
         result = dict()
         for fs in FichierSource.get_fichiers_source():
-            trad = fs.get_traduction('fr_FR')
+            trad = fs.get_traduction(langue)
             if trad != None:
                 result[fs.get_key()] = trad
 
@@ -186,4 +204,5 @@ options()
 FichierSource.set_jeedom_dir(jeedomDir)
 get_textes_from_source()
 get_textes_from_precedent()
+get_textes_from_core()
 write_traduction();

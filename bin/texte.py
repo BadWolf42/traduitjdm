@@ -31,7 +31,6 @@ class Texte(object):
         del self.__textes[self.__texte]
 
     def set_traduction (self, langue, texteTraduit, source, fileKey=None):
-
         self.__traduction.setdefault(langue,dict())
         self.__traduction[langue][source] = texteTraduit
 
@@ -40,6 +39,9 @@ class Texte(object):
         if langue in self.__traduction:
             if "precedent" in self.__traduction[langue]:
                 traduction = self.__traduction[langue]["precedent"] 
+            elif "core" in self.__traduction[langue]:
+                print (vars(self))
+                traduction = self.__traduction[langue]["core"] 
         return (self.__texte, traduction)
 
     def get_texte (self):
