@@ -5,7 +5,7 @@
 Le programme peut être téléchargé depuis la page [release_note](release_notes.html)
 
 ## Introduction
-Les textes dans les interfaces Jeedom peuvent être affichés en diverses langues selon le context. Pour celà, les textes devant pouvoir être affichés en différentes langues doivent être marqués sous la forme `{ {texte à afficher} }` &#123 ou `__("texte à afficher".__FILE__)`. Les traductions de ces textes sont configurées dans des fichiers placés dans le répertoire `core/i18n` du plugin.
+Les textes dans les interfaces Jeedom peuvent être affichés en diverses langues selon le context. Pour celà, les textes devant pouvoir être affichés en différentes langues doivent être marqués sous la forme `{ {texte à afficher} }` &#123; ou `__("texte à afficher".__FILE__)`. Les traductions de ces textes sont configurées dans des fichiers placés dans le répertoire `core/i18n` du plugin.
 
 Le but de **traduitjdm** est de chercher les occurrences `{{texte à afficher}}` et `__("texte à afficher",__FILE__)` dans le code d'un plugin et de créer les fichiers de traductions dans `core/i18n`.
 
