@@ -1,6 +1,6 @@
 # Documentation de "*traduitjdm*"
 
-*traduitjdm* est un programme, en Python, d'aide à la traduction des plugins de [jeedom](http://jeedom.com)
+*traduitjdm* est un programme, en Python, d'aide à la traduction des plugins de [Jeedom](http://jeedom.com)
 
 Le programme peut être téléchargé depuis la page [release_note](release_notes.html)
 
