@@ -39,15 +39,22 @@ class Texte(object):
     def __del__ (self):
         del self.__textes[self.__texte]
 
-    def set_traduction (self, langue, texteTraduit, source, fileKey=None):
+    def add_traduction (self, langue, traduction, source, fileKey=None):
         self.__traduction.setdefault(langue,dict())
-        self.__traduction[langue][source] = texteTraduit
+        if source == "core":
+            self.__traduction[langue].setdefault(source, list())
+            self.__traduction[langue][source].append(traduction)
+        else:
+            self.__traduction[langue][source] = traduction
 
     def get_traduction (self, langue):
         traduction = self.__texte
         if langue in self.__traduction:
             for source in reversed (self.__priorite):
                 if source in self.__traduction[langue]:
+                    if source == "core":
+                        traduction = self.__traduction[langue][source][0]
+                    else:
                         traduction = self.__traduction[langue][source]
         return (self.__texte, traduction)
 

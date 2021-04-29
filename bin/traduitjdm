@@ -155,7 +155,7 @@ def get_textes_from_precedent():
                 fs = FichierSource.by_key(fkey)
                 for texte in data[fkey]:
                     txt = Texte.by_texte(texte)
-                    txt.set_traduction(langue, data[fkey][texte], "precedent", fkey)
+                    txt.add_traduction(langue, data[fkey][texte], "precedent", fkey)
                     fs.add_texte(txt)
 
 
@@ -175,7 +175,7 @@ def get_textes_from_core():
             for texte in data[fkey]:
                 txt = Texte.by_texte(texte, False)
                 if (txt != None):
-                    txt.set_traduction(langue, data[fkey][texte], "core")
+                    txt.add_traduction(langue, data[fkey][texte], "core")
 
 def write_traduction( textes ="" ):
     Verbose ("Ecriture du/des fichier(s) de traduction(s)...\n")
