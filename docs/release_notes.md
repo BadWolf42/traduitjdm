@@ -1,7 +1,7 @@
 # Release Notes
 
 ## v0.3.1 (01/05/2021)
-[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.3.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.3.0.zip)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.3.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.3.1.zip)
 
 - Détection de texte à traduire de longueur 0
 
