@@ -1,5 +1,5 @@
 
-from verbose import *
+from message import *
 
 class Texte(object):
 
@@ -23,22 +23,6 @@ class Texte(object):
             if not prio in result:
                 result.append(prio)
         cls.__priorite = result
-
-    @staticmethod
-    def select_traduction(source, langue, texte, choix):
-        print ('\nLa source <' + source + '> propose plusieurs traductionsi en <' + langue + '> pour : "' + texte + '"\n')
-        for i in range (len(choix)):
-            print (i+1, ":", choix[i])
-        print ()
-        while True:
-            try:
-                reponse = int(input ("Laquelle de ces traductions doit être utilisée (#) ? "))
-            except ValueError:
-                print ("Prière de saisir le numéro de la traduction voulue")
-                reponse = 0
-            reponse = reponse -1
-            if reponse >= 0 and reponse < len(choix):
-                return (texte[reponse -1])
 
     # --- Les méthodes d'intance ---
 
@@ -64,23 +48,48 @@ class Texte(object):
         else:
             self.__traduction[langue][source] = traduction
 
+    def select_traduction(self, source, langue):
+        choix = self.__traduction[langue][source]
+        if len(choix) == 1:
+            return choix[0]
+        print ('\nLa source <' + source + '> propose plusieurs traductionsi en <' + langue + '> pour : "' + self.__texte + '"\n')
+        for i in range (len(choix)):
+            print (i+1, ":", choix[i])
+        print ()
+        while True:
+            try:
+                reponse = int(input ("Laquelle de ces traductions doit être utilisée (#) ? "))
+            except ValueError:
+                print ("Prière de saisir le numéro de la traduction voulue")
+                reponse = 0
+            reponse = reponse -1
+            if reponse >= 0 and reponse < len(choix):
+                return (choix[reponse])
+
     def get_traduction (self, langue):
         traduction = self.__texte
-        if langue in self.__traduction:
-            for source in self.__priorite:
-                if source in self.__traduction[langue]:
-                    if source == "core":
-                        if len(self.__traduction[langue][source]) == 1:
-                            traduction = self.__traduction[langue][source][0]
-                        else:
-                            traduction = self.select_traduction(source,
-                                                                langue,
-                                                                self.__texte,
-                                                                self.__traduction[langue][source])
-                    else:
+        if langue == "fr_FR":
+            # On ne traduit pas le Français en Français
+            return (self.__texte, traduction)
+
+        if not langue in self.__traduction:
+            # Il n'y a pas de traduction disponible pour cette langue
+            return (self.__texte, traduction)
+
+        OK = False
+        for source in self.__priorite:
+            if not OK and source in self.__traduction[langue]:
+                if source == "precedent":
+                    # On conserve la version pécédente uniquement si elle 
+                    # a été traduite
+                    if self.__traduction[langue][source] != self.__texte:
                         traduction = self.__traduction[langue][source]
-                    break
+                        OK = True
+                elif source == "core":
+                    traduction = self.select_traduction(source, langue)
+                    OK = True
         return (self.__texte, traduction)
+
 
     def get_texte (self):
         return self.__texte

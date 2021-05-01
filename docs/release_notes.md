@@ -6,7 +6,7 @@
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.4.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.4.0.zip)
 
 - Sélection interractive si le core propose plusieurs traductions pour un même texte.
-- Pas de recherche de traduction dans la core pour "fr_FR". En français, la traduction est le texte lui-même.
+- Pas de recherche de traduction dans le core pour "fr_FR". En français, la traduction est le texte lui-même.
 
 ## v0.3.1 (01/05/2021)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.3.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.3.1.zip)

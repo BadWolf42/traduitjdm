@@ -10,7 +10,7 @@ import texte
 import json
 from fichierSource import FichierSource
 from texte import Texte
-from verbose import *
+from message import *
 
 backup = False
 langues = None

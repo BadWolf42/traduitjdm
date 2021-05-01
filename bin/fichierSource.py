@@ -2,7 +2,7 @@
 import inspect
 import re
 from texte import Texte
-from verbose import *
+from message import *
 
 class FichierSource(object):
 
