@@ -80,7 +80,11 @@ class FichierSource(object):
 
             # On garde ce qui précède le prochains }}
             pos = content.find("}}")
-            self.__textes.add(Texte.by_texte(content[:pos]))
+            txt = content[:pos]
+            if len(txt) != 0:
+                self.__textes.add(Texte.by_texte(txt))
+            else:
+                print ("\nATTENTION, il y a un texte de longeur 0 dans le fichier <" + self.__path + ">\n")
 
             # retrait du texte
             content = content[pos:]
@@ -113,7 +117,10 @@ class FichierSource(object):
                 if (txt[0] == "'" and txt [-1] == "'") or (txt[0] == '"' and txt [-1] == '"'):
                     txt = txt[1:-1]
 
-                self.__textes.add(Texte.by_texte(txt))
+                if len(txt) != 0:
+                    self.__textes.add(Texte.by_texte(txt))
+                else:
+                    print ("\nATTENTION, il y a un texte de longeur 0 dans le fichier <" + self.__path + ">\n")
 
                 # Retrait du prochain __( et de ce qui précède
                 content = content[pos:]
@@ -125,6 +132,12 @@ class FichierSource(object):
 
         result = dict()
         for texte in self.__textes:
+
+            Debug ("\n==========\nfichier: " + self.__path + "\n")
+            Debug ("\n  ".join(dir(self)))
+            Debug ("\n-----------\ntexte: "+ texte.get_texte() + "\n")
+            Debug ("  " + "\n  ".join(dir(texte)) + "\n")
+
             traduction = texte.get_traduction(langue)
             result[traduction[0]] = traduction[1]
 
