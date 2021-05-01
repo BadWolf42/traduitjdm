@@ -82,9 +82,10 @@ class FichierSource(object):
             pos = content.find("}}")
             txt = content[:pos]
             if len(txt) != 0:
+                Verbose ("        " + txt + "\n")
                 self.__textes.add(Texte.by_texte(txt))
             else:
-                print ("\nATTENTION, il y a un texte de longeur 0 dans le fichier <" + self.__path + ">\n")
+                print ("\nATTENTION, il y a un texte de longueur 0 dans le fichier <" + self.__path + ">\n")
 
             # retrait du texte
             content = content[pos:]
@@ -118,9 +119,10 @@ class FichierSource(object):
                     txt = txt[1:-1]
 
                 if len(txt) != 0:
+                    Verbose ("        " + txt + "\n")
                     self.__textes.add(Texte.by_texte(txt))
                 else:
-                    print ("\nATTENTION, il y a un texte de longeur 0 dans le fichier <" + self.__path + ">\n")
+                    print ("\nATTENTION, il y a un texte de longueur 0 dans le fichier <" + self.__path + ">\n")
 
                 # Retrait du prochain __( et de ce qui précède
                 content = content[pos:]

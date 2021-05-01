@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-version = "0.3.1"
+version = "0.4.0"
 
 import inspect
 import getopt
@@ -31,7 +31,7 @@ def options():
     global jeedomDir
     global plugin
 
-    languesConnues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU", "tr")
+    languesConnues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU")
 
     usage = """
 Usage:
@@ -110,8 +110,9 @@ Usage:
         sys.exit(1)
 
     for langue in langues:
-        if not langue in langues:
-            sys.stderr.write ("Les langues reconnues sont:\n   " + "\n   ".join(langues) + "\n")
+        if not langue in languesConnues:
+            sys.stderr.write ("\n<" + langue + "> n'est pas une langue reconnues!\n\n")
+            sys.stderr.write ("Les langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
             sys.exit(1)
 
 
@@ -130,7 +131,7 @@ def get_textes_from_source():
 
         for fileName in files:
             if fileName[-4:] == ".php" or fileName[-3:] == ".js":
-                Verbose ("    " + fileName + "...\n")
+                Verbose ("    " + root + "/" + fileName + "...\n")
                 fichier = FichierSource(root + "/" + fileName)
                 fichier.search_textes()
     return textesFromPlugin
@@ -148,7 +149,6 @@ def get_textes_from_precedent():
             Verbose ("        Pas de version précédente à lire!\n")
 
         if content != None:
-            Verbose ("        Lecture de la version précédente...\n")
             data = json.loads(content)
 
             for fkey in data:
@@ -162,20 +162,21 @@ def get_textes_from_precedent():
 def get_textes_from_core():
     Verbose ("Recherche des traductions dansle core...\n")
     for langue in langues:
-        Verbose ("    Langue: " + langue + "...\n")
-        try:
-            with open( jeedomDir + "/core/i18n/" + langue + ".json") as f:
-                content = f.read()
-        except Exception as ex:
-            Verbose ("        Erreur lors de la lecture de " + langue + ".json!\n")
+        if langue != "fr_FR":
+            Verbose ("    Langue: " + langue + "...\n")
+            try:
+                with open( jeedomDir + "/core/i18n/" + langue + ".json") as f:
+                    content = f.read()
+            except Exception as ex:
+                Verbose ("        Erreur lors de la lecture de " + langue + ".json!\n")
 
-        data = json.loads(content)
-        for fkey in data:
-            fs = FichierSource.by_key(fkey)
-            for texte in data[fkey]:
-                txt = Texte.by_texte(texte, False)
-                if (txt != None):
-                    txt.add_traduction(langue, data[fkey][texte], "core")
+            data = json.loads(content)
+            for fkey in data:
+                fs = FichierSource.by_key(fkey)
+                for texte in data[fkey]:
+                    txt = Texte.by_texte(texte, False)
+                    if (txt != None):
+                        txt.add_traduction(langue, data[fkey][texte], "core")
 
 def write_traduction( textes ="" ):
     Verbose ("Ecriture du/des fichier(s) de traduction(s)...\n")

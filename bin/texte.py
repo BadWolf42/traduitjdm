@@ -24,6 +24,22 @@ class Texte(object):
                 result.append(prio)
         cls.__priorite = result
 
+    @staticmethod
+    def select_traduction(source, langue, texte, choix):
+        print ('\nLa source <' + source + '> propose plusieurs traductionsi en <' + langue + '> pour : "' + texte + '"\n')
+        for i in range (len(choix)):
+            print (i+1, ":", choix[i])
+        print ()
+        while True:
+            try:
+                reponse = int(input ("Laquelle de ces traductions doit être utilisée (#) ? "))
+            except ValueError:
+                print ("Prière de saisir le numéro de la traduction voulue")
+                reponse = 0
+            reponse = reponse -1
+            if reponse >= 0 and reponse < len(choix):
+                return (texte[reponse -1])
+
     # --- Les méthodes d'intance ---
 
     def __new__ (cls,txt=""):
@@ -43,19 +59,27 @@ class Texte(object):
         self.__traduction.setdefault(langue,dict())
         if source == "core":
             self.__traduction[langue].setdefault(source, list())
-            self.__traduction[langue][source].append(traduction)
+            if not traduction in self.__traduction[langue][source]:
+                self.__traduction[langue][source].append(traduction)
         else:
             self.__traduction[langue][source] = traduction
 
     def get_traduction (self, langue):
         traduction = self.__texte
         if langue in self.__traduction:
-            for source in reversed (self.__priorite):
+            for source in self.__priorite:
                 if source in self.__traduction[langue]:
                     if source == "core":
-                        traduction = self.__traduction[langue][source][0]
+                        if len(self.__traduction[langue][source]) == 1:
+                            traduction = self.__traduction[langue][source][0]
+                        else:
+                            traduction = self.select_traduction(source,
+                                                                langue,
+                                                                self.__texte,
+                                                                self.__traduction[langue][source])
                     else:
                         traduction = self.__traduction[langue][source]
+                    break
         return (self.__texte, traduction)
 
     def get_texte (self):
