@@ -36,7 +36,7 @@ def options():
     usage = """
 Usage:
 ~~~~~~
-    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-v] [-d] [-L] [-b] [-j <jeedomDir>] [-f core]  -l <langue>[,<langue>,...] plugin
+    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-c] [-v] [-d] [-L] [-b] [-j <jeedomDir>] [-f core]  -l <langue>[,<langue>,...] plugin
 
     Outils pour la traduction de plugin Jeedom
 
@@ -53,7 +53,7 @@ Usage:
 """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "Vhvdbjf:L:l:")
+        opts, args = getopt.getopt(sys.argv[1:], "cVhvdbjf:L:l:")
     except getopt.GetoptError as err:
         print (err)
         sys.stderr.write(usage)
@@ -92,6 +92,9 @@ Usage:
         elif opt == "-v":
             set_verbose(True)
 
+        elif opt == "-c":
+            set_color(False)
+
         elif opt == "-d":
             set_verbose(True)
             set_debug(True)
@@ -122,7 +125,7 @@ def plugin_dir():
 
 
 def get_textes_from_source():
-    Verbose ("Lecture du code...\n")
+    Verbose ("Lecture du code...")
     textesFromPlugin = dict()
     for root, dirs, files in os.walk(plugin_dir()):
         for dirname in dirs:
@@ -131,22 +134,22 @@ def get_textes_from_source():
 
         for fileName in files:
             if fileName[-4:] == ".php" or fileName[-3:] == ".js":
-                Verbose ("    " + root + "/" + fileName + "...\n")
+                Verbose ("    " + root + "/" + fileName + "...")
                 fichier = FichierSource(root + "/" + fileName)
                 fichier.search_textes()
     return textesFromPlugin
 
 
 def get_textes_from_precedent():
-    Verbose ("Lecture des versions précédantes...\n")
+    Verbose ("Lecture des versions précédantes...")
     for langue in langues:
-        Verbose ("    Langue: " + langue + "...\n")
+        Verbose ("    Langue: " + langue + "...")
         content = None
         try:
             with open(plugin_dir() + "/core/i18n/" + langue + ".json") as f:
                 content = f.read()
         except Exception as ex:
-            Verbose ("        Pas de version précédente à lire!\n")
+            Verbose ("        Pas de version précédente à lire!")
 
         if content != None:
             data = json.loads(content)
@@ -160,15 +163,15 @@ def get_textes_from_precedent():
 
 
 def get_textes_from_core():
-    Verbose ("Recherche des traductions dansle core...\n")
+    Verbose ("Recherche des traductions dansle core...")
     for langue in langues:
         if langue != "fr_FR":
-            Verbose ("    Langue: " + langue + "...\n")
+            Verbose ("    Langue: " + langue + "...")
             try:
                 with open( jeedomDir + "/core/i18n/" + langue + ".json") as f:
                     content = f.read()
             except Exception as ex:
-                Verbose ("        Erreur lors de la lecture de " + langue + ".json!\n")
+                Verbose ("        Erreur lors de la lecture de " + langue + ".json!")
 
             data = json.loads(content)
             for fkey in data:
@@ -179,13 +182,13 @@ def get_textes_from_core():
                         txt.add_traduction(langue, data[fkey][texte], "core")
 
 def write_traduction( textes ="" ):
-    Verbose ("Ecriture du/des fichier(s) de traduction(s)...\n")
+    Verbose ("Ecriture du/des fichier(s) de traduction(s)...")
     for langue in langues:
-        Verbose ("    Langue: " + langue + "...\n")
+        Verbose ("    Langue: " + langue + "...")
         fileName = plugin_dir() + "/core/i18n/" + langue + ".json"
 
         if backup:
-            Verbose ("        Rotation des fichiers existants...\n")
+            Verbose ("        Rotation des fichiers existants...")
             if os.path.exists (fileName + ".bck.5"):
                 os.unlink(fileName + ".bck.5")
 
