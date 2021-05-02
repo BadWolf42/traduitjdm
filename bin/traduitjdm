@@ -17,7 +17,6 @@ langues = None
 jeedomDir = "/var/www/html"
 plugin = None
 
-
 def options():
     '''Traitement de options de la ligne de commande.
 
@@ -32,91 +31,144 @@ def options():
     global plugin
 
     languesConnues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU")
+    cfgFile = os.path.realpath(os.path.dirname(sys.argv[0]) + "/../etc/" + os.path.basename(sys.argv[0] + ".cfg"))
+    cfgFileParDefaut = True
 
     usage = """
 Usage:
 ~~~~~~
-    """  + os.path.basename(sys.argv[0]) + """ [-V] [-h] [-c] [-v] [-d] [-L] [-b] [-j <jeedomDir>] [-f core]  -l <langue>[,<langue>,...] plugin
+    """  + os.path.basename(sys.argv[0]) + """ [-h] 
+    """  + os.path.basename(sys.argv[0]) + """ [-V]
+    """  + os.path.basename(sys.argv[0]) + """ [-L]
+    """  + os.path.basename(sys.argv[0]) + """ [-v] [-d] [-c] [-b] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
 
     Outils pour la traduction de plugin Jeedom
 
-    -h                          Affichage de cette aide
-    -V                          Affichage de la version
+    -h                          Affiche cette aide
+    -V                          Affiche la version
+    -L                          Affiche la liste des langues reconnues
     -v                          Un peu de babillage
     -d                          Debug (implique -v)
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
-    -L                          Affiche la liste des langues reconnues
+    -C <cfgFile>                Fichier de configuration ('""" + cfgFile + """' par défaut)
+    -j <jeedomDir>              Répertoire d'installation de Jeedom
+                                ('""" + jeedomDir + """' par défaut)
     -f core                     Priorité aux traductions provenant du core de Jeedom
-    -j <jeedomDir>              Répertoire d'installation de Jeedom ('""" + jeedomDir + """' par défaut)
     -l <langue>[,<langue>...]   Langue cible de la traduction
+    <plugin>                    Nom du plugin à traduire. Argument obligtoire si le
+                                plugin n'est pas défini dans le fichier de configuration
 
 """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "cVhvdbjf:L:l:")
+        opts, args = getopt.getopt(sys.argv[1:], "hVLvdcbC:j:f:l:")
     except getopt.GetoptError as err:
-        print (err)
+        Error ("\n", err)
         sys.stderr.write(usage)
         sys.exit(1)
 
     for opt, arg in opts:
 
-        if opt == "-V":
+        if opt == "-h":
+            print (usage)
+            sys.exit(1)
+
+        elif opt == "-V":
             print ("\n", os.path.basename(sys.argv[0]), "Version:", version , "\n\n")
             sys.exit(0)
 
-        elif opt == "-h":
-            sys.stderr.write(usage)
+        elif opt == "-L":
+            print ("\nLes langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
             sys.exit(1)
+
+        elif opt == "-v":
+            set_verbose(True)
+
+        elif opt == "-d":
+            set_verbose(True)
+            set_debug(True)
+
+        elif opt == "-c":
+            set_color(False)
+
+        elif opt == "-b":
+            backup = True
+
+        elif opt == "-C":
+            cfgFile = arg
+            cfgFileParDefaut = False
 
         elif opt == "-j":
             jeedomDir = arg
             if jeedomDir.endswith("/"):
                 jeedomDir = jeedomDir[:-1]
 
-        elif opt == "-L":
-            sys.stderr.write ("\nLes langues reconnues sont:\n   " + "\n   ".join(langues) + "\n")
-            sys.exit(1)
-
         elif opt == "-f":
             if arg == "core":
                 Texte.set_priorite(arg)
             else:
-                sys.stderr.write ("\nErreur dans l'option '-f':\n")
+                Error (" Erreur dans l'option '-f':")
                 sys.stderr.write(usage)
                 sys.exit(1)
 
         elif opt == "-l":
             langues = set(arg.split(","))
 
-        elif opt == "-v":
-            set_verbose(True)
+    if len(args) > 0:
+        plugin = args[0]
 
-        elif opt == "-c":
-            set_color(False)
+    # Lecture du fichier de configuration
+    #####################################
+    try:
+        with open(cfgFile) as cfg:
+            content = cfg.read().splitlines()
 
-        elif opt == "-d":
-            set_verbose(True)
-            set_debug(True)
+        Verbose ("Lecture du fichier de configuration <", cfgFile, ">")
+        stanza = ""
+        for line in content:
+            pos = line.find("#")
+            if pos >= 0:
+                line = line[0:pos]
+            line = line.strip()
+            if len(line) > 0:
+                if line[0] == "[" and line[-1] == "]":
+                    stanza = line[1:-1].lower()
+                    Debug ("  stanza: ", stanza)
+                elif stanza == "global":
+                    (key, egal, value) = line.partition("=")
+                    key = key.strip().lower()
+                    value = value.strip()
+                    Debug ("    ", key, ":\t", value)
+                    if key == "langues":
+                        if langues is None :
+                            langues = set(value.split(","))
+                    elif key == "plugin":
+                        if plugin is None:
+                            plugin = value
 
-        elif opt == "-b":
-            backup = True
 
-    if len(args) == 0:
-        sys.stderr.write("\nNom du plugin manquant!\n" + usage)
+    except FileNotFoundError:
+        if not cfgFileParDefaut:
+            Error (" Le fichier de configuration <", cfgFile, "> n'existe pas!")
+            sys.exit (1)
+
+    # Vérification des paramètres
+    #############################
+    if plugin is None:
+        Error ("\n Nom du plugin à traduire n'est pas défini!")
+        sys.stderr.write(usage)
         sys.exit(1)
     
-    plugin = args[0]
-
     if langues is None:
-        sys.stderr.write("\nOption -l manquante!\n" + usage)
+        Error ("\n Option -l manquante!")
+        sys.stderr.write(usage)
         sys.exit(1)
 
     for langue in langues:
         if not langue in languesConnues:
-            sys.stderr.write ("\n<" + langue + "> n'est pas une langue reconnues!\n\n")
-            sys.stderr.write ("Les langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
+            Error ("\n <" + langue + "> n'est pas une langue reconnue!")
+            sys.stderr.write ("\n Les langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
             sys.exit(1)
 
 

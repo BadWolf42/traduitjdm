@@ -1,0 +1,12 @@
+
+# Fichier de configuration pour "traduitjdm"
+
+# Les noms des stanzas ne sont pas semsibles au majuscules et minuscules
+
+[global]
+
+# ID du plugin à traduire
+plugin = id_du_plugin
+
+# Liste des langues pour lesquelles les traductions doivent être configurées
+langues = pt_PT,en_US,fr_FR
