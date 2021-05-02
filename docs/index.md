@@ -12,20 +12,21 @@ Le but de **traduitjdm** est de chercher les occurrences `{ {texte à afficher}}
 ## Syntaxe de "*traduitjdm*"
 ```
 Usage:
-~~~~~~
-    traduitjdm [-V] [-h] [-v] [-d] [-L] [-b] [-j <jeedomDir>] [-f core] -l <langueCible> plugin
+~~~~~
+    traduitjdm [-V] [-h] [-c] [-v] [-d] [-L] [-b] [-j <jeedomDir>] [-f core]  -l <langue>[,<langue>,...] plugin
 
     Outils pour la traduction de plugin Jeedom
 
-    -h                Affichage de cette aide
-    -V                Affichage de la version
-    -v                Un peu de babillage
-    -d                Debug (implique -v)
-    -b                Backup: le fichier existant est renommé avec l'extention ".bck"
-    -L                Affiche la liste des langues reconnues
-    -f core           Priorité aux traductions provenant du core de Jeedom
-    -j <jeedomDir>    Répertoire d'installation de Jeedom ('/var/www/html' par défaut)
-    -l <langueCible>  Langue cible de la traduction
+    -h                          Affichage de cette aide
+    -V                          Affichage de la version
+    -v                          Un peu de babillage
+    -d                          Debug (implique -v)
+    -c                          Désactive l'affichage en couleur
+    -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
+    -L                          Affiche la liste des langues reconnues
+    -f core                     Priorité aux traductions provenant du core de Jeedom
+    -j <jeedomDir>              Répertoire d'installation de Jeedom ('/var/www/html' par défaut)
+    -l <langue>[,<langue>...] Langue cible de la traduction
 ```
 
 - *-h*  
@@ -36,6 +37,8 @@ Usage:
     Affiche quelques informations durant l'exécution des programmes.
 - *-d*    
     Augmente la quantité d'informations affichées pas *-v*
+- *-c*    
+    Désactive la couleur pour l'affichage des messages à la consoles
 - *-b*  
     Les 6 versions précédente du fichiers sont conservées.    
     Si le fichier `fr_FR.json` doit être créé, alors    

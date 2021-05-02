@@ -44,11 +44,12 @@ Usage:
     -V                          Affichage de la version
     -v                          Un peu de babillage
     -d                          Debug (implique -v)
+    -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
     -L                          Affiche la liste des langues reconnues
     -f core                     Priorité aux traductions provenant du core de Jeedom
     -j <jeedomDir>              Répertoire d'installation de Jeedom ('""" + jeedomDir + """' par défaut)
-    -l <langue>[s,.<langue>...] Langue cible de la traduction
+    -l <langue>[,<langue>...]   Langue cible de la traduction
 
 """
 
