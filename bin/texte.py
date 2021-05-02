@@ -1,5 +1,5 @@
 
-from verbose import *
+from message import *
 
 class Texte(object):
 
@@ -39,17 +39,57 @@ class Texte(object):
     def __del__ (self):
         del self.__textes[self.__texte]
 
-    def set_traduction (self, langue, texteTraduit, source, fileKey=None):
+    def add_traduction (self, langue, traduction, source, fileKey=None):
         self.__traduction.setdefault(langue,dict())
-        self.__traduction[langue][source] = texteTraduit
+        if source == "core":
+            self.__traduction[langue].setdefault(source, list())
+            if not traduction in self.__traduction[langue][source]:
+                self.__traduction[langue][source].append(traduction)
+        else:
+            self.__traduction[langue][source] = traduction
+
+    def select_traduction(self, source, langue):
+        choix = self.__traduction[langue][source]
+        if len(choix) == 1:
+            return choix[0]
+        print ('\nLa source <' + source + '> propose plusieurs traductionsi en <' + langue + '> pour : "' + self.__texte + '"\n')
+        for i in range (len(choix)):
+            print (i+1, ":", choix[i])
+        print ()
+        while True:
+            try:
+                reponse = int(input ("Laquelle de ces traductions doit être utilisée (#) ? "))
+            except ValueError:
+                print ("Prière de saisir le numéro de la traduction voulue")
+                reponse = 0
+            reponse = reponse -1
+            if reponse >= 0 and reponse < len(choix):
+                return (choix[reponse])
 
     def get_traduction (self, langue):
         traduction = self.__texte
-        if langue in self.__traduction:
-            for source in reversed (self.__priorite):
-                if source in self.__traduction[langue]:
+        if langue == "fr_FR":
+            # On ne traduit pas le Français en Français
+            return (self.__texte, traduction)
+
+        if not langue in self.__traduction:
+            # Il n'y a pas de traduction disponible pour cette langue
+            return (self.__texte, traduction)
+
+        OK = False
+        for source in self.__priorite:
+            if not OK and source in self.__traduction[langue]:
+                if source == "precedent":
+                    # On conserve la version pécédente uniquement si elle 
+                    # a été traduite
+                    if self.__traduction[langue][source] != self.__texte:
                         traduction = self.__traduction[langue][source]
+                        OK = True
+                elif source == "core":
+                    traduction = self.select_traduction(source, langue)
+                    OK = True
         return (self.__texte, traduction)
+
 
     def get_texte (self):
         return self.__texte

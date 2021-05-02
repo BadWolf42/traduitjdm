@@ -12,30 +12,42 @@ Le but de **traduitjdm** est de chercher les occurrences `{ {texte à afficher}}
 ## Syntaxe de "*traduitjdm*"
 ```
 Usage:
-~~~~~~
-    traduitjdm [-V] [-h] [-v] [-d] [-L] [-b] [-j <jeedomDir>] [-f core] -l <langueCible> plugin
+~~~~~
+    traduitjdm [-h] 
+    traduitjdm [-V]
+    traduitjdm [-L]
+    traduitjdm [-v] [-d] [-c] [-b] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
 
     Outils pour la traduction de plugin Jeedom
 
-    -h                Affichage de cette aide
-    -V                Affichage de la version
-    -v                Un peu de babillage
-    -d                Debug (implique -v)
-    -b                Backup: le fichier existant est renommé avec l'extention ".bck"
-    -L                Affiche la liste des langues reconnues
-    -f core           Priorité aux traductions provenant du core de Jeedom
-    -j <jeedomDir>    Répertoire d'installation de Jeedom ('/var/www/html' par défaut)
-    -l <langueCible>  Langue cible de la traduction
+    -h                          Affiche cette aide
+    -V                          Affiche la version
+    -L                          Affiche la liste des langues reconnues
+    -v                          Un peu de babillage
+    -d                          Debug (implique -v)
+    -c                          Désactive l'affichage en couleur
+    -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
+    -C <cfgFile>                Fichier de configuration ('/home/chris/traduitjdm/etc/traduitjdm.cfg' par défaut)
+    -j <jeedomDir>              Répertoire d'installation de Jeedom
+                                ('/var/www/html' par défaut)
+    -f core                     Priorité aux traductions provenant du core de Jeedom
+    -l <langue>[,<langue>...]   Langue cible de la traduction
+    <plugin>                    Nom du plugin à traduire. Argument obligtoire si le
+                                plugin n'est pas défini dans le fichier de configuration
 ```
 
 - *-h*  
     Affiche l'aide comme ci-dessus puis interromp l'exécution.
 - *-V*  
     Affiche la version du programme puis interromp l'exécution.
+ - *-L*  
+    Affiche la liste des langues reconnues
 - *-v*  
     Affiche quelques informations durant l'exécution des programmes.
 - *-d*    
     Augmente la quantité d'informations affichées pas *-v*
+- *-c*    
+    Désactive la couleur pour l'affichage des messages à la consoles
 - *-b*  
     Les 6 versions précédente du fichiers sont conservées.    
     Si le fichier `fr_FR.json` doit être créé, alors    
@@ -45,13 +57,13 @@ Usage:
         - `fr_FR.json.bck.1` est renommé `fr_FR.json.bck.2`   
         - `fr_FR.json.bck` est renommé `fr_FR.json.bck.1`   
         - `fr_FR.json` est renommé `fr_FR.json.bck`   
- - *-L*  
-    Affiche la liste des langues reconnues
- - *-f core*  
+- *-C <cfgFile>
+    Le fichier de configuration (voir le contenu de *traduit.cfg.exemple* pour la syntaxe du fichier de configuration)
+- *-f core*  
     Les traductions trouvées dans le core de Jeedom sont utilisées en priorité
- - *-j \<jeedomDir>*    
+- *-j \<jeedomDir>*    
     Répertoire d'installation de jeedom. Les textes à tradtuire seront recherchés sous `<jeedoDir>/plugins/<plugin>` et la fichier de traduction sera générer dans `<jeedoDir>/plugins/<plugin>/core/i18n`    
-  - *-l \<langueCible>*    
+- *-l \<langueCible>*    
     *fr_FR* pour le Français, *en-US* pour l'anglais... Voir le contenu du répertoire `<jeedoDir>/core/i18n` pour les langues reconnues par Jeedom.
 
 ## Principe de fonctionnement
