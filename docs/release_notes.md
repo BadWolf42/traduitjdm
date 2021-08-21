@@ -3,6 +3,8 @@
 # Release Notes
 
 ## v0.5.0 (21/08/2021)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.5.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.5.0.zip)
+
 - Le répertoire "core/i18n" du plugin est créé s'il n'existe pas encore
 - Quelques corrections de texte
 
