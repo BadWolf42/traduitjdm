@@ -8,6 +8,7 @@ import sys
 import os.path
 import texte
 import json
+import glob
 from fichierSource import FichierSource
 from texte import Texte
 from message import *
@@ -34,13 +35,14 @@ def options():
     cfgFile = os.path.realpath(os.path.dirname(sys.argv[0]) + "/../etc/" + os.path.basename(sys.argv[0] + ".cfg"))
     cfgFileParDefaut = True
 
-    usage = """
+    progName = os.path.basename(sys.argv[0])
+    usage = f"""
 Usage:
 ~~~~~~
-    """  + os.path.basename(sys.argv[0]) + """ [-h] 
-    """  + os.path.basename(sys.argv[0]) + """ [-V]
-    """  + os.path.basename(sys.argv[0]) + """ [-L]
-    """  + os.path.basename(sys.argv[0]) + """ [-v] [-d] [-c] [-b] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
+    {progName} [-h] 
+    {progName} [-V]
+    {progName} [-L]
+    {progName} [-v] [-d] [-c] [-b] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
 
     Outils pour la traduction de plugin Jeedom
 
@@ -51,9 +53,9 @@ Usage:
     -d                          Debug (implique -v)
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
-    -C <cfgFile>                Fichier de configuration ('""" + cfgFile + """' par défaut)
+    -C <cfgFile>                Fichier de configuration ('{cfgFile}' par défaut)
     -j <jeedomDir>              Répertoire d'installation de Jeedom
-                                ('""" + jeedomDir + """' par défaut)
+                                ('{jeedomDir}' par défaut)
     -f core                     Priorité aux traductions provenant du core de Jeedom
     -l <langue>[,<langue>...]   Langue cible de la traduction
     <plugin>                    Nom du plugin à traduire. Argument obligtoire si le
@@ -72,7 +74,7 @@ Usage:
 
         if opt == "-h":
             print (usage)
-            sys.exit(1)
+            sys.exit(0)
 
         elif opt == "-V":
             print ("\n", os.path.basename(sys.argv[0]), "Version:", version , "\n\n")
@@ -237,8 +239,12 @@ def get_textes_from_core():
 def write_traduction( textes ="" ):
     Verbose ("Ecriture du/des fichier(s) de traduction(s)...")
     for langue in langues:
-        Verbose ("    Langue: " + langue + "...")
-        fileName = plugin_dir() + "/core/i18n/" + langue + ".json"
+        Verbose (f"    Langue: {langue}...")
+
+        fileName = plugin_dir() + "/core/i18n"
+        if (not os.path.exists (fileName)):
+                os.mkdir(fileName)
+        fileName = fileName + "/" + langue + ".json"
 
         if backup:
             Verbose ("        Rotation des fichiers existants...")

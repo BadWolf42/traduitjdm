@@ -52,7 +52,7 @@ class Texte(object):
         choix = self.__traduction[langue][source]
         if len(choix) == 1:
             return choix[0]
-        print ('\nLa source <' + source + '> propose plusieurs traductionsi en <' + langue + '> pour : "' + self.__texte + '"\n')
+        print (f'\nLa source <{source}> propose plusieurs traductions en <{langue}> pour : "{self.__texte}"\n')
         for i in range (len(choix)):
             print (i+1, ":", choix[i])
         print ()
