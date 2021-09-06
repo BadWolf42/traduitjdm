@@ -2,6 +2,13 @@
 
 # Release Notes
 
+## v0.6.0 (7/9/2021)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.0.zip)
+
+- Amélioration de la recherche des textes à traduire
+- Recherche des textes à traduire dans les fichiers (\*.php, \*.js et \*.html). Avant, on cherchait uniquemen dans \*php et \*.js.
+- On ne cherche pas de textes à tratuire dans le répertoire *docs*
+
 ## v0.5.0 (21/08/2021)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.5.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.5.0.zip)
 

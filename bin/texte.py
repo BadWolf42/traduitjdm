@@ -24,7 +24,7 @@ class Texte(object):
                 result.append(prio)
         cls.__priorite = result
 
-    # --- Les méthodes d'intance ---
+    # --- Les méthodes d'instance ---
 
     def __new__ (cls,txt=""):
         if txt == "":

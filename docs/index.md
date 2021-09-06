@@ -68,20 +68,20 @@ Usage:
 
 ## Principe de fonctionnement
 ### Recherche des textes à traduire
-**traduitjdm** commence par constuire une lise des texte à traduire en cherchant les textes dans le code du plugin pus en y ajoutant les textes trouvés lors d'exécution précédentes qui se trouvent dans le fichier de traduction existant.
+**traduitjdm** commence par constuire une lise des textes à traduire en cherchant les textes dans le code du plugin puis en y ajoutant les textes trouvés lors d'exécutions précédentes qui se trouvent dans le fichier de traduction existant.
 
 ### Recherche de traductions
-**traduitjdm** va chercher des traductions dans plusieurs souces pour chaque texte à traduire:
+**traduitjdm** va chercher des traductions dans plusieurs sources pour chaque texte à traduire:
 1. Dans la dernière version du fichier de traduction.
     Les traductions se trouvant dans ce fichier sont soit la traduction telle qu'elle a été déterminée lors de la dernière exécution, soit un texte modifié après exécution en éditant le fichier.
 2. Dans le **core** de Jeedom.
-    Les traductions definies dans le *core* de Jeedom sont récupérées.
+    Les traductions définies dans le *core* de Jeedom sont récupérées.
 
 ### Sélection des traductions
 Pour chaque texte à traduire une traduction sera reprise de l'une des soures de traduction dans l'ordre de piorité suivant:
 
 1. Traduction trouvée dans la version précédente.
 1. Traduction trouvée dans le core.
-1. Si aucune traduction n'a été trouvée, on garde le texte en français comme proposition de tradduction.
+1. Si aucune traduction n'a été trouvée, on garde le texte en français comme proposition de traduction.
 
 L'option `-f core` force l'usage de la traduction trouvée dans le core en priorité 
