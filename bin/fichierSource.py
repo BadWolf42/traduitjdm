@@ -82,7 +82,7 @@ class FichierSource(object):
 
         if self.__path[-4:] == ".php":
             Debug ('        Recherche __("...",__FILE__)\n')
-            for txt in re.findall('__\s*\(\s*"(.*?)\s*"\s*,\s*__FILE__',content):
+            for txt in re.findall('__\s*\(\s*["\'](.*?)\s*["\']\s*,\s*__FILE__',content):
                 if len(txt) != 0:
                     Verbose ("        " + txt)
                     self.__textes.add(Texte.by_texte(txt))

@@ -2,6 +2,11 @@
 
 # Release Notes
 
+## v0.6.1 (9/9/2021)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.1.zip)
+
+- Amélioration d'une regex
+
 ## v0.6.0 (7/9/2021)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.0.zip)
 
