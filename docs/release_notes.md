@@ -2,6 +2,11 @@
 
 # Release Notes
 
+## v0.7.0 (1/11/2021)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.7.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.7.0.zip)
+
+- Recherche de testxes à tratuidre dans les fichiers *\*.json*
+
 ## v0.6.1 (9/9/2021)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.6.1.zip)
 
