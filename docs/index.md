@@ -12,7 +12,7 @@ Le but de **traduitjdm** est de chercher les occurrences `{ {texte à afficher}}
 ## Syntaxe de "*traduitjdm*"
 ```
 Usage:
-~~~~~
+~~~~~~
     traduitjdm [-h] 
     traduitjdm [-V]
     traduitjdm [-L]
@@ -27,6 +27,7 @@ Usage:
     -d                          Debug (implique -v)
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
+    -p                          Purge: retire les textes qui ne sont pas/plus trouvés dans le code
     -C <cfgFile>                Fichier de configuration ('/home/chris/traduitjdm/etc/traduitjdm.cfg' par défaut)
     -j <jeedomDir>              Répertoire d'installation de Jeedom
                                 ('/var/www/html' par défaut)
@@ -57,6 +58,8 @@ Usage:
         - `fr_FR.json.bck.1` est renommé `fr_FR.json.bck.2`   
         - `fr_FR.json.bck` est renommé `fr_FR.json.bck.1`   
         - `fr_FR.json` est renommé `fr_FR.json.bck`   
+- *-p*
+    Les textes précédement tradduits ne sont pas conservés s'ils ne sont plus dans le code source du plugin.
 - *-C <cfgFile>
     Le fichier de configuration (voir le contenu de *traduit.cfg.exemple* pour la syntaxe du fichier de configuration)
 - *-f core*  
