@@ -63,6 +63,9 @@ class FichierSource(object):
     def add_texte(self, txt):
         self.__textes.add(txt)
 
+    def get_textes(self):
+        return self.__textes
+
     def search_textes(self):
         try:
             with (open(self.__path, "r")) as f:

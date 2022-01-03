@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-version = "0.7.0"
+version = "0.8.0"
 
 import inspect
 import getopt
@@ -17,6 +17,7 @@ backup = False
 langues = None
 jeedomDir = "/var/www/html"
 plugin = None
+purge = False
 
 def options():
     '''Traitement de options de la ligne de commande.
@@ -30,6 +31,7 @@ def options():
     global langues
     global jeedomDir
     global plugin
+    global purge
 
     languesConnues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU")
     cfgFile = os.path.realpath(os.path.dirname(sys.argv[0]) + "/../etc/" + os.path.basename(sys.argv[0] + ".cfg"))
@@ -53,6 +55,7 @@ Usage:
     -d                          Debug (implique -v)
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
+    -p                          Purge: retire les textes qui ne sont pas/plus trouvés dans le code
     -C <cfgFile>                Fichier de configuration ('{cfgFile}' par défaut)
     -j <jeedomDir>              Répertoire d'installation de Jeedom
                                 ('{jeedomDir}' par défaut)
@@ -64,7 +67,7 @@ Usage:
 """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVLvdcbC:j:f:l:")
+        opts, args = getopt.getopt(sys.argv[1:], "hVLvdcbpC:j:f:l:")
     except getopt.GetoptError as err:
         Error ("\n", err)
         sys.stderr.write(usage)
@@ -96,6 +99,9 @@ Usage:
 
         elif opt == "-b":
             backup = True
+
+        elif opt == "-p":
+            purge = True
 
         elif opt == "-C":
             cfgFile = arg
@@ -218,6 +224,8 @@ def get_textes_from_precedent():
                 fs = FichierSource.by_key(fkey)
                 for texte in data[fkey]:
                     txt = Texte.by_texte(texte)
+                    if purge or txt in fs.get_textes():
+                        continue
                     txt.add_traduction(langue, data[fkey][texte], "precedent", fkey)
                     fs.add_texte(txt)
 
