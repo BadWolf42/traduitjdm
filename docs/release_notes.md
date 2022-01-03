@@ -2,6 +2,11 @@
 
 # Release Notes
 
+## v0.8.0 (3/1/2022)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.0.zip)
+
+- Ajout le l'option `-p` pour purger les textes qui ne sont plus dans le code du plugin
+
 ## v0.7.0 (1/11/2021)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.7.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.7.0.zip)
 
