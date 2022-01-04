@@ -2,6 +2,11 @@
 
 # Release Notes
 
+## v0.8.1 (4/1/2022)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.1.zip)
+
+- Correction d'un bug en relation avec l'option `-p`
+
 ## v0.8.0 (3/1/2022)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.0.zip)
 
