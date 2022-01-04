@@ -2,6 +2,11 @@
 
 # Release Notes
 
+## v0.9.0 (4/1/2022)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.9.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.9.0.zip)
+
+- Ajout de l'option `-t` pour indenter les fichier json avec des tabulation au lieu de 4 expaces.
+
 ## v0.8.1 (4/1/2022)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.1.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.8.1.zip)
 
