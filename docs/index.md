@@ -28,7 +28,7 @@ Usage:
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
     -p                          Purge: retire les textes qui ne sont pas/plus trouvés dans le code
-    -t                          Utilisatin de tabulation pour les indentations (sinon, les indentation sont de 4 espaces)
+    -t                          Utilisation de tabulations pour les indentations (sinon, les indentations sont de 4 espaces)
     -C <cfgFile>                Fichier de configuration ('/home/jeedom/traduitjdm/etc/traduitjdm.cfg' par défaut)
     -j <jeedomDir>              Répertoire d'installation de Jeedom
                                 ('/var/www/html' par défaut)
@@ -62,7 +62,7 @@ Usage:
 - *-p*
     Les textes précédement tradduits ne sont pas conservés s'ils ne sont plus dans le code source du plugin.
 - *-t*
-    Utilisation de tabulation, au lieu de 4 espaces, pour les indentations dans le fichier json.
+    Utilisation de tabulations, au lieu de 4 espaces, pour les indentations dans les fichiers json.
 - *-C <cfgFile>
     Le fichier de configuration (voir le contenu de *traduit.cfg.exemple* pour la syntaxe du fichier de configuration)
 - *-f core*  
