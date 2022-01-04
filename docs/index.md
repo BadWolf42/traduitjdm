@@ -16,7 +16,7 @@ Usage:
     traduitjdm [-h] 
     traduitjdm [-V]
     traduitjdm [-L]
-    traduitjdm [-v] [-d] [-c] [-b] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
+    traduitjdm [-v] [-d] [-c] [-b] [-p] [-t] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
 
     Outils pour la traduction de plugin Jeedom
 
@@ -28,7 +28,8 @@ Usage:
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
     -p                          Purge: retire les textes qui ne sont pas/plus trouvés dans le code
-    -C <cfgFile>                Fichier de configuration ('/home/chris/traduitjdm/etc/traduitjdm.cfg' par défaut)
+    -t                          Utilisatin de tabulation pour les indentations (sinon, les indentation sont de 4 espaces)
+    -C <cfgFile>                Fichier de configuration ('/home/jeedom/traduitjdm/etc/traduitjdm.cfg' par défaut)
     -j <jeedomDir>              Répertoire d'installation de Jeedom
                                 ('/var/www/html' par défaut)
     -f core                     Priorité aux traductions provenant du core de Jeedom
@@ -60,6 +61,8 @@ Usage:
         - `fr_FR.json` est renommé `fr_FR.json.bck`   
 - *-p*
     Les textes précédement tradduits ne sont pas conservés s'ils ne sont plus dans le code source du plugin.
+- *-t*
+    Utilisation de tabulation, au lieu de 4 espaces, pour les indentations dans le fichier json.
 - *-C <cfgFile>
     Le fichier de configuration (voir le contenu de *traduit.cfg.exemple* pour la syntaxe du fichier de configuration)
 - *-f core*  

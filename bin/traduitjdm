@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-version = "0.8.1"
+version = "0.9.0"
 
 import inspect
 import getopt
@@ -18,6 +18,7 @@ langues = None
 jeedomDir = "/var/www/html"
 plugin = None
 purge = False
+indent = 4
 
 def options():
     '''Traitement de options de la ligne de commande.
@@ -32,6 +33,7 @@ def options():
     global jeedomDir
     global plugin
     global purge
+    global indent
 
     languesConnues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU")
     cfgFile = os.path.realpath(os.path.dirname(sys.argv[0]) + "/../etc/" + os.path.basename(sys.argv[0] + ".cfg"))
@@ -44,7 +46,7 @@ Usage:
     {progName} [-h] 
     {progName} [-V]
     {progName} [-L]
-    {progName} [-v] [-d] [-c] [-b] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
+    {progName} [-v] [-d] [-c] [-b] [-p] [-t] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
 
     Outils pour la traduction de plugin Jeedom
 
@@ -56,6 +58,7 @@ Usage:
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
     -p                          Purge: retire les textes qui ne sont pas/plus trouvés dans le code
+    -t                          Utilisatin de tabulation pour les indentations (sinon, les indentation sont de 4 espaces)
     -C <cfgFile>                Fichier de configuration ('{cfgFile}' par défaut)
     -j <jeedomDir>              Répertoire d'installation de Jeedom
                                 ('{jeedomDir}' par défaut)
@@ -67,7 +70,7 @@ Usage:
 """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVLvdcbpC:j:f:l:")
+        opts, args = getopt.getopt(sys.argv[1:], "hVLvdcbptC:j:f:l:")
     except getopt.GetoptError as err:
         Error ("\n", err)
         sys.stderr.write(usage)
@@ -102,6 +105,9 @@ Usage:
 
         elif opt == "-p":
             purge = True
+
+        elif opt == "-t":
+            indent = "\t"
 
         elif opt == "-C":
             cfgFile = arg
@@ -281,7 +287,7 @@ def write_traduction( textes ="" ):
                 result[fs.get_key()] = trad
 
         with open(fileName, "w") as f:
-            f.write(json.dumps(result, ensure_ascii=False, sort_keys = True, indent=4).replace("/","\/"))
+            f.write(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= indent).replace("/","\/"))
 
 
 
