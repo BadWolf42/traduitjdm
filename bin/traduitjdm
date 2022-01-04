@@ -58,7 +58,7 @@ Usage:
     -c                          Désactive l'affichage en couleur
     -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
     -p                          Purge: retire les textes qui ne sont pas/plus trouvés dans le code
-    -t                          Utilisatin de tabulation pour les indentations (sinon, les indentation sont de 4 espaces)
+    -t                          Utilisation de tabulations pour les indentations (sinon, les indentations sont de 4 espaces)
     -C <cfgFile>                Fichier de configuration ('{cfgFile}' par défaut)
     -j <jeedomDir>              Répertoire d'installation de Jeedom
                                 ('{jeedomDir}' par défaut)
