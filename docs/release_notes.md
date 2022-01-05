@@ -2,6 +2,11 @@
 
 # Release Notes
 
+## v0.10.0 (5/1/2022)
+[tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.10.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.10.0.zip)
+
+- Traitement des quotes et double quotes dans les textes à traduire.
+
 ## v0.9.0 (4/1/2022)
 [tgz](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.9.0.tar.gz) [zip](https://github.com/ktn001/traduitjdm/archive/refs/tags/v0.9.0.zip)
 

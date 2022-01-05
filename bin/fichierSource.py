@@ -85,9 +85,17 @@ class FichierSource(object):
 
         if self.__path[-4:] == ".php":
             Debug ('        Recherche __("...",__FILE__)\n')
-            for txt in re.findall('__\s*\(\s*["\'](.*?)\s*["\']\s*,\s*__FILE__',content):
+            for txt in re.findall('__\s*\(\s*(["\'].*?\s*["\'])\s*,\s*\S+\s*\)',content):
                 if len(txt) != 0:
                     Verbose ("        " + txt)
+                    if (txt[0] != txt[-1]):
+                        Verbose ("            ====  Erreur de quote !!! ====")
+                        continue
+                    quote = txt[0]
+                    txt = txt[1:-1]
+                    if (txt.find(quote) >= 0):
+                        Verbose ("            ====  Délimineur de début et fin de chaîne touvé dans le texte !!! ====")
+                        continue
                     self.__textes.add(Texte.by_texte(txt))
                 else:
                     Warning (f"ATTENTION, il y a un texte de longueur 0 dans le fichier <{self.__path}>")

@@ -83,6 +83,8 @@ Usage:
 2. Dans le **core** de Jeedom.
     Les traductions définies dans le *core* de Jeedom sont récupérées.
 
+Les textes traduits par la fonction `__('texte',__FILE__)` dans les scripts phpdoivent être encdrés par des quotes ou double quotes (`'` ou `"`). De plus, ils ne doivent pas contenir le caractère d'encadrement. 
+
 ### Sélection des traductions
 Pour chaque texte à traduire une traduction sera reprise de l'une des soures de traduction dans l'ordre de piorité suivant:
 
