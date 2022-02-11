@@ -95,6 +95,8 @@ class FichierSource(object):
                     print ("====  Délimineur de début et fin de chaîne trouvé dans le texte !!!")
                     print (f"      Fichier: {self.__path}")
                     print (f"      texte  : {texte}")
+                else:
+                    self.__textes.add(Texte.by_texte(texte))
 
     def get_traduction (self, langue):
         if (len(self.__textes) == 0):
