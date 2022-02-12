@@ -67,7 +67,7 @@ class FichierSource(object):
         return self.__textes
 
     def search_textes(self):
-        patern___ = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<texte>.*)(?P=delim))\s*,\s*\S+\s*\)')
+        patern___ = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<texte>.*?)(?P=delim))\s*,\s*\S+\s*\)')
         try:
             with (open(self.__path, "r")) as f:
                 content = f.read()
