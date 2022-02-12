@@ -2,7 +2,7 @@
 
 version = "0.10.3"
 
-import inspect
+import argparse
 import getopt
 import sys
 import os.path
@@ -39,104 +39,68 @@ def options():
     cfgFile = os.path.realpath(os.path.dirname(sys.argv[0]) + "/../etc/" + os.path.basename(sys.argv[0] + ".cfg"))
     cfgFileParDefaut = True
 
-    progName = os.path.basename(sys.argv[0])
-    usage = f"""
-Usage:
-~~~~~~
-    {progName} [-h] 
-    {progName} [-V]
-    {progName} [-L]
-    {progName} [-v] [-d] [-c] [-b] [-p] [-t] [-C cfgFile] [-j <jeedomDir>] [-f core] -l <langue>[,<langue>,...] [<plugin>]
+    parser = argparse.ArgumentParser(description="Génération de fichiers de traduction pour les plugins Jeedom", add_help=False)
+    infos_group = parser.add_argument_group('infos')
+    infos_group.add_argument('-h', '--help', action='help', help="Affiche cette aide et quitte")
+    infos_group.add_argument('-V', '--version', action='version', version=f"version: {version}", help="Affiche la version du programme et quitte")
+    infos_group.add_argument('-L', '--langues-connues', action='store_true', help='Affiche la liste des langues reconnues et quitte')
+    exec_group = parser.add_argument_group('Traduction')
+    exec_group.add_argument('-v', '--verbose', action='store_true', help='Un peu de babillage')
+    exec_group.add_argument('-d', '--debug', action='store_true', help='Un peu plus de babillage')
+    exec_group.add_argument('-C', '--nocolor', action='store_true', help="Désactive l'affichage en couleur")
+    exec_group.add_argument('-b', '--backup', action='store_true', help="Les fichiers existants sont renommés avec l'extension \".bck\"")
+    exec_group.add_argument('-p', '--purge', action='store_true', help="Retire les textes qui ne sont pas/plus trouvés dans le code")
+    exec_group.add_argument('-t', '--tab', action='store_true', help="Utilisation de tabulations pour les indentations (sinon, les indentations sont de 4 espaces)")
+    exec_group.add_argument('-c', '--config', metavar="ConfigFile", type=argparse.FileType('r'), default=cfgFile, help=f"Fichier de configuration ('{cfgFile}' par défaut)")
+    exec_group.add_argument('-j', '--JeeDir', metavar="JeedomDir", help=f"Répertoire d'installation de Jeedom ('{jeedomDir}' par défaut)")
+    exec_group.add_argument('-f', '--force', nargs='+', choices=['core'], help='Priorité aux traductions provenant du core de Jeedom')
+    exec_group.add_argument('-l', '--langues', nargs='+', help="Liste des langues cible")
+    exec_group.add_argument('plugin', nargs='?', help="Le plugin à traduire")
+    args = parser.parse_args()
 
-    Outils pour la traduction de plugin Jeedom
+    print(args)
+    if args.langues_connues:
+        print ("\nLes langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
+        sys.exit(0)
 
-    -h                          Affiche cette aide
-    -V                          Affiche la version
-    -L                          Affiche la liste des langues reconnues
-    -v                          Un peu de babillage
-    -d                          Debug (implique -v)
-    -c                          Désactive l'affichage en couleur
-    -b                          Backup: le fichier existant est renommé avec l'extention ".bck"
-    -p                          Purge: retire les textes qui ne sont pas/plus trouvés dans le code
-    -t                          Utilisation de tabulations pour les indentations (sinon, les indentations sont de 4 espaces)
-    -C <cfgFile>                Fichier de configuration ('{cfgFile}' par défaut)
-    -j <jeedomDir>              Répertoire d'installation de Jeedom
-                                ('{jeedomDir}' par défaut)
-    -f core                     Priorité aux traductions provenant du core de Jeedom
-    -l <langue>[,<langue>...]   Langue cible de la traduction
-    <plugin>                    Nom du plugin à traduire. Argument obligtoire si le
-                                plugin n'est pas défini dans le fichier de configuration
+    if args.verbose:
+        set_verbose(True)
 
-"""
+    if args.debug:
+        set_verbose(True)
+        set_debug(True)
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVLvdcbptC:j:f:l:")
-    except getopt.GetoptError as err:
-        Error ("\n", err)
-        sys.stderr.write(usage)
-        sys.exit(1)
+    if args.nocolor:
+        set_color(False)
 
-    for opt, arg in opts:
+    if args.backup:
+        backup = True
 
-        if opt == "-h":
-            print (usage)
-            sys.exit(0)
+    if args.purge:
+        purge = True
 
-        elif opt == "-V":
-            print ("\n", os.path.basename(sys.argv[0]), "Version:", version , "\n\n")
-            sys.exit(0)
+    if args.tab:
+        indent = "\t"
 
-        elif opt == "-L":
-            print ("\nLes langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
-            sys.exit(1)
+    if args.JeeDir:
+        jeedomDir = args.JeeDir
+        if jeedomDir.endswith("/"):
+            jeedomDir = jeedomDir[:-1]
+    
+    if args.force:
+        if args.force[0] == "core":
+            Texte.set_priorite('core')
 
-        elif opt == "-v":
-            set_verbose(True)
+    if args.langues:
+        langues = args.langues
 
-        elif opt == "-d":
-            set_verbose(True)
-            set_debug(True)
-
-        elif opt == "-c":
-            set_color(False)
-
-        elif opt == "-b":
-            backup = True
-
-        elif opt == "-p":
-            purge = True
-
-        elif opt == "-t":
-            indent = "\t"
-
-        elif opt == "-C":
-            cfgFile = arg
-            cfgFileParDefaut = False
-
-        elif opt == "-j":
-            jeedomDir = arg
-            if jeedomDir.endswith("/"):
-                jeedomDir = jeedomDir[:-1]
-
-        elif opt == "-f":
-            if arg == "core":
-                Texte.set_priorite(arg)
-            else:
-                Error (" Erreur dans l'option '-f':")
-                sys.stderr.write(usage)
-                sys.exit(1)
-
-        elif opt == "-l":
-            langues = set(arg.split(","))
-
-    if len(args) > 0:
-        plugin = args[0]
+    if args.plugin:
+        plugin = args.plugin
 
     # Lecture du fichier de configuration
     #####################################
     try:
-        with open(cfgFile) as cfg:
-            content = cfg.read().splitlines()
+        content = args.config.read().splitlines()
 
         Verbose ("Lecture du fichier de configuration <", cfgFile, ">")
         stanza = ""
@@ -161,22 +125,21 @@ Usage:
                         if plugin is None:
                             plugin = value
 
-
     except FileNotFoundError:
         if not cfgFileParDefaut:
-            Error (" Le fichier de configuration <", cfgFile, "> n'existe pas!")
+            Error (" Le fichier de configuration <", cfgFile, "> est introuvable!")
             sys.exit (1)
 
     # Vérification des paramètres
     #############################
     if plugin is None:
         Error ("\n Nom du plugin à traduire n'est pas défini!")
-        sys.stderr.write(usage)
+        parser.print_usage()
         sys.exit(1)
     
     if langues is None:
         Error ("\n Option -l manquante!")
-        sys.stderr.write(usage)
+        parser.print_usage()
         sys.exit(1)
 
     for langue in langues:
