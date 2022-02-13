@@ -1,12 +1,106 @@
 
 # Fichier de configuration pour "traduitjdm"
+#
+# - Les noms des sections ne sont pas sensibles au majuscules et minuscules
+# - Les paramêtre de type boolean sont True s'ils sont défini à "1", 'o', 'oui',s
+#   'y', 'yes' ou 'true' (insensible à la case) et False dans tous les autres cas.
 
-# Les noms des stanzas ne sont pas semsibles au majuscules et minuscules
 
 [global]
 
+#-----------------
 # ID du plugin à traduire
+# 
+# Ce plugin sera traduit si aucun plugin n'est indiqué dans la ligne de commande
+# type: string
+# défaut: None
 plugin = id_du_plugin
 
+#-----------------
+# Mode verbose
+#
+# Ce paramêtre sera ignoré si l'option '-v', '--verbose' ou '--noverbose' est indiquée
+# dans la ligne de commande
+# type: boolean
+# défaut: False
+#verbose = 0
+
+#-----------------
+# Couleur
+# Utilisation de couleurs pour l'affichage de messages d'erreur ou de warning
+#
+# Ce paramêtre sera ignoré si l'option '-C', '--color' ou '--nocolor' est indiquée
+# dans la ligne de commande
+# type: boolean
+# défaut: True
+#couleur = true
+
+#-----------------
+# Backup
+# Création d'une sauvegarde des anciens fichiers de traduction
+#
+# Ce paramêtre sera ignoré si l'option '-b', '--backup' ou '--nobackup' est indiquée
+# dans la ligne de commande
+# type: boolean
+# défaut: False
+#backup = no
+
+#-----------------
+# Purge
+# Suppression des anciens textes qui ne sont pas/plus présents dans le code du plugin
+#
+# Ce paramêtre sera ignoré si l'option '-p', '--purge' ou '--nopurge' est indiquée
+# dans la ligne de commande
+# type: boolean
+# défaut: False
+#backup = false
+
+#-----------------
+# Tabulation
+# Indentation dans les fichiers de traduction pas des talbuations au lieur de quatre " "
+#
+# Ce paramêtre sera ignoré si l'option '-t', '--tab' ou '--notab' est indiquée
+# dans la ligne de commande
+# type: boolean
+# défaut: False
+#backup = false
+
+#-----------------
+# répertoire de Jeedom
+# Répertoire dans lequel jedrodom est installé le plugin à traduire sera cherché dans le 
+# sous répertoire plugins
+#
+# Ce paramètre sera ignoré si l'option '-j' ou '--jeeDir' est indiquées dans le ligne de
+# commande
+# type: string
+# défaut: /var/www/html
+#jeedomDir = /var/www/html
+
+#-----------------
 # Liste des langues pour lesquelles les traductions doivent être configurées
-langues = pt_PT,en_US,fr_FR
+#
+# Cette liste sera remplacée par la liste fournie via l'opion "-l" ou "--langues" de
+# la ligne de commande
+# type: string (liste de langues séparée par des ',')
+# defaut: None
+#langues = en_US,fr_FR
+
+#-----------------
+# Exclusions
+# Liste de fichiers ou répertoires qui seront exclus de la traduction
+#
+# Cette liste sera ignorée si l'option '-x' ou '-exclude' set indiquée dans le ligne de
+# commande
+# Ce paramètre peut être répété, la liste des répertoires ou fichiers à exclure sera construite en
+# concaténant les répétitions de ce paramètre
+#
+# Comme dans le shell, les caratères spéciaux suivant peuvent êtree utilisés:
+# * : reconnaît n'importe quoi
+# ? : reconnaît n'importe quel caractère unique
+# [seq] : reconnaît n'importe quel caractère dans `seq`
+# [!seq] : reconnaît n'importe quel caractère qui n'est pas dans `seq`
+#
+# type: string (liste de fichiers ou répertoires séparée par des ',')
+# defaut: None
+#exclude = docs
+#exclude = test_*.php,test_*.json

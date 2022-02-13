@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-version = "0.10.3"
+version = "1.0.0"
 
 import argparse
 import getopt
@@ -9,6 +9,7 @@ import os.path
 import texte
 import json
 import glob
+import fnmatch
 from fichierSource import FichierSource
 from texte import Texte
 from message import *
@@ -19,6 +20,66 @@ jeedomDir = "/var/www/html"
 plugin = None
 purge = False
 indent = 4
+exclude = set()
+
+def read_cfg(cfg_file_name):
+    try:
+        cfg_file = open(cfg_file_name)
+        content = cfg_file.read().splitlines()
+        cfg_file.close()
+    except FileNotFoundError:
+        if not cfgFileParDefaut:
+            Error (" Le fichier de configuration <", cfgFile, "> est introuvable!")
+            sys.exit (1)
+    verite = ['1', 'o', 'oui', 'y', 'yes', 'true']
+    cfg = {}
+    stanza = ""
+    for line in content:
+        pos = line.find("#")
+        if pos >= 0:
+            line = line[0:pos]
+        line = line.strip()
+        if len(line) > 0:
+            if line[0] == "[" and line[-1] == "]":
+                stanza = line[1:-1].lower()
+                Debug ("  stanza: ", stanza)
+            elif stanza == "global":
+                (key, egal, value) = line.partition("=")
+                key = key.strip().lower()
+                value = value.strip()
+                Debug ("    ", key, ":\t", value)
+
+                if key == 'verbose':
+                    cfg['verbose'] = value.lower() in verite
+
+                elif key in ['color', 'couleur']:
+                    cfg['color'] = value.lower() in verite
+
+                elif key == 'backup':
+                    cfg['backup'] = value.lower() in verite
+
+                elif key == 'purge':
+                    cfg['purge'] = value.lower() in verite
+
+                elif key in ['tab', 'tabulation']:
+                    cfg['tab'] = value.lower() in verite
+
+                elif key in ['jeedom', 'jeedomdir', 'jeedir']:
+                    cfg['jeedir'] = value.lower() in verite
+
+                elif key == "langues":
+                    if not 'langues' in cfg:
+                        cfg['langues'] = set()
+                    cfg['langues'] = cfg['langues'].union(set(value.split(",")))
+
+                elif key == "exclude":
+                    if not 'exclude' in cfg:
+                        cfg['exclude'] = set()
+                    cfg['exclude'] = cfg['exclude'].union(set(value.split(",")))
+
+                elif key == "plugin":
+                    cfg['plugin'] = value
+    return cfg
 
 def options():
     '''Traitement de options de la ligne de commande.
@@ -34,6 +95,10 @@ def options():
     global plugin
     global purge
     global indent
+    global excludes
+
+    def set_str(values):
+        return set(values.split(','))
 
     languesConnues = ("de_DE", "en_US", "es_ES", "fr_FR", "id_ID", "it_IT", "ja_JP", "pt_PT", "ru_RU")
     cfgFile = os.path.realpath(os.path.dirname(sys.argv[0]) + "/../etc/" + os.path.basename(sys.argv[0] + ".cfg"))
@@ -45,100 +110,130 @@ def options():
     infos_group.add_argument('-V', '--version', action='version', version=f"version: {version}", help="Affiche la version du programme et quitte")
     infos_group.add_argument('-L', '--langues-connues', action='store_true', help='Affiche la liste des langues reconnues et quitte')
     exec_group = parser.add_argument_group('Traduction')
-    exec_group.add_argument('-v', '--verbose', action='store_true', help='Un peu de babillage')
+
+    verbose_group = exec_group.add_mutually_exclusive_group()
+    verbose_group.add_argument('-v', '--verbose', action='store_true', help='Un peu de babillage')
+    verbose_group.add_argument('--noverbose', action='store_true', help='Pas de babillage')
     exec_group.add_argument('-d', '--debug', action='store_true', help='Un peu plus de babillage')
-    exec_group.add_argument('-C', '--nocolor', action='store_true', help="Désactive l'affichage en couleur")
-    exec_group.add_argument('-b', '--backup', action='store_true', help="Les fichiers existants sont renommés avec l'extension \".bck\"")
-    exec_group.add_argument('-p', '--purge', action='store_true', help="Retire les textes qui ne sont pas/plus trouvés dans le code")
-    exec_group.add_argument('-t', '--tab', action='store_true', help="Utilisation de tabulations pour les indentations (sinon, les indentations sont de 4 espaces)")
+
+    color_group = exec_group.add_mutually_exclusive_group()
+    color_group.add_argument('-C', '--color', action='store_true', help="Active l'affichage en couleur")
+    color_group.add_argument('--nocolor', action='store_true', help="Désactive l'affichage en couleur")
+
+    backup_group = exec_group.add_mutually_exclusive_group()
+    backup_group.add_argument('-b', '--backup', action='store_true', help="Les fichiers existants sont renommés avec l'extension \".bck\"")
+    backup_group.add_argument('--nobackup', action='store_true', help="Pa de suavegarde des fichiers existants")
+
+    purge_group = exec_group.add_mutually_exclusive_group()
+    purge_group.add_argument('-p', '--purge', action='store_true', help="Retire les textes qui ne sont pas/plus trouvés dans le code")
+    purge_group.add_argument('--nopurge', action='store_true', help="Pas de purge des traductions existantes")
+
+    tab_group = exec_group.add_mutually_exclusive_group()
+    tab_group.add_argument('-t', '--tab', action='store_true', help="Utilisation de tabulations pour les indentations (sinon, les indentations sont de 4 espaces)")
+    tab_group.add_argument('--notab', action='store_true', help="Les indentations sont de 4 espaces)")
+
     config_group = exec_group.add_mutually_exclusive_group()
-    config_group.add_argument('-c', '--config', metavar="ConfigFile", type=argparse.FileType('r'), default=cfgFile, help=f"Fichier de configuration ('{cfgFile}' par défaut)")
-    config_group.add_argument('-i', '--ignoreCfgFile', action='store_true', help="Ignore le fichier de config")
-    exec_group.add_argument('-j', '--JeeDir', metavar="JeedomDir", help=f"Répertoire d'installation de Jeedom ('{jeedomDir}' par défaut)")
-    exec_group.add_argument('-f', '--force', nargs='+', choices=['core'], help='Priorité aux traductions provenant du core de Jeedom')
-    exec_group.add_argument('-l', '--langues', nargs='+', help="Liste des langues cible")
+    config_group.add_argument('-c', '--config', metavar="ConfigFile", default=cfgFile, help=f"Fichier de configuration ('{cfgFile}' par défaut)")
+    config_group.add_argument('--noconfig', action='store_true', help="Ignore le fichier de config")
+
+    jeedir_group = exec_group.add_mutually_exclusive_group()
+    jeedir_group.add_argument('-j', '--JeeDir', metavar="JeedomDir", help=f"Répertoire d'installation de Jeedom")
+    jeedir_group.add_argument('--noJeedomDir', action='store_true', help=f"Force l'utilisation de '{jeedomDir}'")
+
+    exec_group.add_argument('-l', '--langues', metavar="langues[,langues ...]", type=set_str, help="Liste des langues cibles")
+
+    exclude_group = exec_group.add_mutually_exclusive_group()
+    exclude_group.add_argument('-x', '--exclude', type=set_str, help="Fichiers ou répertoires à exclure des traductions")
+    exclude_group.add_argument('--noexclude', action='store_true', help="Fichiers ou répertoires à exclure des traductions")
+
+    exec_group.add_argument('-f', '--force', metavar="source1[,source2 ...]", help='Ordre de priorité des sources de traduction. Les sources sont "precedent"s et "core"')
     exec_group.add_argument('plugin', nargs='?', help="Le plugin à traduire")
     args = parser.parse_args()
 
-    print(args)
+    #print (args)
     if args.langues_connues:
         print ("\nLes langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
         sys.exit(0)
 
+    if not args.noconfig:
+        configs = read_cfg (cfgFile)
+    else:
+        configs= {}
+    #print(configs)
+
     if args.verbose:
-        set_verbose(True)
+        set_verbose(args.verbose)
+    elif not args.noverbose and 'verbose' in configs:
+        set_verbose(configs['verbose'])
 
     if args.debug:
         set_verbose(True)
         set_debug(True)
 
-    if args.nocolor:
+    if args.color:
+        set_color(True)
+    elif args.nocolor:
         set_color(False)
+    elif 'color' in configs:
+        set_color(configs['color'])
 
     if args.backup:
         backup = True
+    elif args.nobackup:
+        backup = False
+    elif 'backup' in configs:
+        backup = configs['color']
 
     if args.purge:
         purge = True
+    elif args.nopurge:
+        purge = False
+    elif 'purge' in configs:
+        purge = configs['purge']
 
     if args.tab:
         indent = "\t"
+    elif args.notab:
+        indent = " "*4
+    elif 'tab' in configs:
+        if configs['tab']:
+            indent = "\t"
+        else:
+            indent = " "*4
 
     if args.JeeDir:
         jeedomDir = args.JeeDir
-        if jeedomDir.endswith("/"):
-            jeedomDir = jeedomDir[:-1]
-    
+    elif not args.noJeedomDir and 'jeedir' in configs:
+        jeedomDir = configs['jeedir']
+    if jeedomDir.endswith("/"):
+        jeedomDir = jeedomDir[:-1]
+
+    if args.langues:
+        langues = args.langues
+    elif 'langues' in configs:
+        langues = configs['langues']
+
     if args.force:
         if args.force[0] == "core":
             Texte.set_priorite('core')
 
-    if args.langues:
-        langues = args.langues
+    if args.exclude:
+        excludes = args.exclude
+    elif not args.noexclude and 'exclude' in configs:
+        excludes = configs['exclude']
 
     if args.plugin:
         plugin = args.plugin
-
-    # Lecture du fichier de configuration
-    #####################################
-    try:
-        content = args.config.read().splitlines()
-
-        Verbose ("Lecture du fichier de configuration <", cfgFile, ">")
-        stanza = ""
-        for line in content:
-            pos = line.find("#")
-            if pos >= 0:
-                line = line[0:pos]
-            line = line.strip()
-            if len(line) > 0:
-                if line[0] == "[" and line[-1] == "]":
-                    stanza = line[1:-1].lower()
-                    Debug ("  stanza: ", stanza)
-                elif stanza == "global":
-                    (key, egal, value) = line.partition("=")
-                    key = key.strip().lower()
-                    value = value.strip()
-                    Debug ("    ", key, ":\t", value)
-                    if key == "langues":
-                        if langues is None :
-                            langues = set(value.split(","))
-                    elif key == "plugin":
-                        if plugin is None:
-                            plugin = value
-
-    except FileNotFoundError:
-        if not cfgFileParDefaut:
-            Error (" Le fichier de configuration <", cfgFile, "> est introuvable!")
-            sys.exit (1)
+    elif 'plugin' in configs:
+        plugin = configs['plugin']
 
     # Vérification des paramètres
     #############################
     if plugin is None:
-        Error ("\n Nom du plugin à traduire n'est pas défini!")
+        Error ("\n Le nom du plugin à traduire n'est pas défini! ")
         parser.print_usage()
         sys.exit(1)
-    
+
     if langues is None:
         Error ("\n Option -l manquante!")
         parser.print_usage()
@@ -163,10 +258,14 @@ def get_textes_from_source():
         for dirname in dirs:
             if dirname[0] == ".":
                 dirs.remove(dirname)
-            if (dirname == "docs" and root == plugin_dir()):
-                dirs.remove(dirname)
+            for d in excludes:
+                if fnmatch.fnmatch(dirname, d):
+                    dirs.remove(dirname)
 
         for fileName in files:
+            for f in excludes:
+                if fnmatch.fnmatch(fileName, f):
+                    continue
             if ( fileName[-4:] == ".php"
               or fileName[-3:] == ".js"
               or fileName[-5:] == ".json"
