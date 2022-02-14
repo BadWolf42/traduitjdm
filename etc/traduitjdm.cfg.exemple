@@ -53,7 +53,7 @@ plugin = id_du_plugin
 # dans la ligne de commande
 # type: boolean
 # défaut: False
-#backup = false
+#purge = false
 
 #-----------------
 # Tabulation
@@ -63,7 +63,7 @@ plugin = id_du_plugin
 # dans la ligne de commande
 # type: boolean
 # défaut: False
-#backup = false
+#tab = false
 
 #-----------------
 # répertoire de Jeedom
