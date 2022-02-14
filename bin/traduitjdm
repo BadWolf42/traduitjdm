@@ -144,7 +144,7 @@ def options():
 
     exclude_group = exec_group.add_mutually_exclusive_group()
     exclude_group.add_argument('-x', '--exclude', type=set_str, help="Fichiers ou répertoires à exclure des traductions")
-    exclude_group.add_argument('--noexclude', action='store_true', help="Fichiers ou répertoires à exclure des traductions")
+    exclude_group.add_argument('--noexclude', action='store_true', help="Pas d'exclusion de fichiers et répertoires")
 
     exec_group.add_argument('-f', '--force', metavar="source1[,source2 ...]", help='Ordre de priorité des sources de traduction. Les sources sont "precedent"s et "core"')
     exec_group.add_argument('plugin', nargs='?', help="Le plugin à traduire")
