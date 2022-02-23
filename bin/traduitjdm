@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-version = "1.0.0"
+version = "1.0.1"
 
 import argparse
 import getopt
@@ -28,9 +28,8 @@ def read_cfg(cfg_file_name):
         content = cfg_file.read().splitlines()
         cfg_file.close()
     except FileNotFoundError:
-        if not cfgFileParDefaut:
-            Error (" Le fichier de configuration <", cfgFile, "> est introuvable!")
-            sys.exit (1)
+        Error (" Le fichier de configuration <", cfg_file_name, "> est introuvable!")
+        sys.exit (1)
     verite = ['1', 'o', 'oui', 'y', 'yes', 'true']
     cfg = {}
     stanza = ""
@@ -150,16 +149,14 @@ def options():
     exec_group.add_argument('plugin', nargs='?', help="Le plugin à traduire")
     args = parser.parse_args()
 
-    #print (args)
     if args.langues_connues:
         print ("\nLes langues reconnues sont:\n   " + "\n   ".join(languesConnues) + "\n")
         sys.exit(0)
 
     if not args.noconfig:
-        configs = read_cfg (cfgFile)
+        configs = read_cfg (args.config)
     else:
         configs= {}
-    #print(configs)
 
     if args.verbose:
         set_verbose(args.verbose)
@@ -319,7 +316,8 @@ def get_textes_from_core():
                     if (txt != None):
                         txt.add_traduction(langue, data[fkey][texte], "core")
 
-def write_traduction( textes ="" ):
+:q
+:qdef write_traduction( textes ="" ):
     Verbose ("Ecriture du/des fichier(s) de traduction(s)...")
     for langue in langues:
         Verbose (f"    Langue: {langue}...")
