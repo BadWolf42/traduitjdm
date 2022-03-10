@@ -316,8 +316,7 @@ def get_textes_from_core():
                     if (txt != None):
                         txt.add_traduction(langue, data[fkey][texte], "core")
 
-:q
-:qdef write_traduction( textes ="" ):
+def write_traduction( textes ="" ):
     Verbose ("Ecriture du/des fichier(s) de traduction(s)...")
     for langue in langues:
         Verbose (f"    Langue: {langue}...")
