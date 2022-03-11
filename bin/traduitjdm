@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-version = "1.0.3"
+version = "1.0.4"
 
 import argparse
 import getopt
@@ -20,7 +20,7 @@ jeedomDir = "/var/www/html"
 plugin = None
 purge = False
 indent = 4
-exclude = set()
+excludes = set()
 
 def read_cfg(cfg_file_name):
     try:
@@ -64,17 +64,17 @@ def read_cfg(cfg_file_name):
                     cfg['tab'] = value.lower() in verite
 
                 elif key in ['jeedom', 'jeedomdir', 'jeedir']:
-                    cfg['jeedir'] = value.lower() in verite
+                    cfg['jeedir'] = value.lower()
 
                 elif key == "langues":
                     if not 'langues' in cfg:
                         cfg['langues'] = set()
                     cfg['langues'] = cfg['langues'].union(set(value.split(",")))
 
-                elif key == "exclude":
-                    if not 'exclude' in cfg:
-                        cfg['exclude'] = set()
-                    cfg['exclude'] = cfg['exclude'].union(set(value.split(",")))
+                elif key in ["exclude", "excludes"]:
+                    if not 'excludes' in cfg:
+                        cfg['excludes'] = set()
+                    cfg['excludes'] = cfg['excludes'].union(set(value.split(",")))
 
                 elif key == "plugin":
                     cfg['plugin'] = value
@@ -217,7 +217,7 @@ def options():
     if args.exclude:
         excludes = args.exclude
     elif not args.noexclude and 'exclude' in configs:
-        excludes = configs['exclude']
+        excludes = configs['excludes']
 
     if args.plugin:
         plugin = args.plugin

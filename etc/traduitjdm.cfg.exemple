@@ -89,7 +89,7 @@ plugin = id_du_plugin
 # Exclusions
 # Liste de fichiers ou répertoires qui seront exclus de la traduction
 #
-# Cette liste sera ignorée si l'option '-x' ou '-exclude' set indiquée dans le ligne de
+# Cette liste sera ignorée si l'option '-x' ou '-exclude' est indiquée dans le ligne de
 # commande
 # Ce paramètre peut être répété, la liste des répertoires ou fichiers à exclure sera construite en
 # concaténant les répétitions de ce paramètre
@@ -102,5 +102,5 @@ plugin = id_du_plugin
 #
 # type: string (liste de fichiers ou répertoires séparée par des ',')
 # defaut: None
-#exclude = docs
-#exclude = test_*.php,test_*.json
+#excludes = docs
+#excludes = test_*.php,test_*.json
