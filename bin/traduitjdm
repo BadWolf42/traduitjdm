@@ -9,6 +9,7 @@ import os.path
 import texte
 import json
 import glob
+import re
 import fnmatch
 from fichierSource import FichierSource
 from texte import Texte
@@ -248,29 +249,41 @@ def plugin_dir():
     return f"{jeedomDir}/plugins/{plugin}"
 
 
+def exclusions_re(excludes):
+    regex_list = []
+    for ex in excludes:
+        regex_list.append(fnmatch.translate(ex))
+        regex_list.append(fnmatch.translate('*/' + ex))
+        regex_list.append(fnmatch.translate(ex + '/*'))
+        regex_list.append(fnmatch.translate('*/' + ex + '/*'))
+    return re.compile('|'.join(regex_list))
+
+
+def get_filepaths(directory, excludes):
+    file_paths = []
+    exclusions = exclusions_re(excludes)
+    for root, directories, files in os.walk(directory):
+        if exclusions.match(root):
+            Debug (f"    Chemin exclu :  {root}")
+            continue
+        for filename in files:
+            if not filename.endswith(('.php', '.js', '.json', '.html')):
+                continue
+            filepath = os.path.join(root, filename)
+            if exclusions.match(filepath):
+                Debug (f"    Fichier exclu : {filepath}")
+                continue
+            file_paths.append(filepath)
+    Debug (f"    Il y a {len(file_paths)} fichier(s) a traiter dans le plugin")
+    return file_paths
+
+
 def get_textes_from_source():
     Verbose ("Recherche de textes dans le code...")
-    textesFromPlugin = dict()
-    for root, dirs, files in os.walk(plugin_dir()):
-        for dirname in dirs:
-            if dirname[0] == ".":
-                dirs.remove(dirname)
-            for d in excludes:
-                if fnmatch.fnmatch(dirname, d):
-                    dirs.remove(dirname)
-
-        for fileName in files:
-            for f in excludes:
-                if fnmatch.fnmatch(fileName, f):
-                    continue
-            if ( fileName[-4:] == ".php"
-              or fileName[-3:] == ".js"
-              or fileName[-5:] == ".json"
-              or fileName[-5:] == ".html"):
-                Verbose (f"    {root}/{fileName}...")
-                fichier = FichierSource(f"{root}/{fileName}")
-                fichier.search_textes()
-    return textesFromPlugin
+    for fileName in get_filepaths(plugin_dir(), excludes):
+        Verbose (f"    {fileName}...")
+        fichier = FichierSource(fileName)
+        fichier.search_textes()
 
 
 def get_textes_from_precedent():
@@ -357,4 +370,4 @@ FichierSource.set_jeedom_dir(jeedomDir)
 get_textes_from_source()
 get_textes_from_precedent()
 get_textes_from_core()
-write_traduction();
+write_traduction()
