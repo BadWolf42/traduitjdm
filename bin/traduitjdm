@@ -216,7 +216,7 @@ def options():
 
     if args.exclude:
         excludes = args.exclude
-    elif not args.noexclude and 'exclude' in configs:
+    elif not args.noexclude and 'excludes' in configs:
         excludes = configs['excludes']
 
     if args.plugin:
