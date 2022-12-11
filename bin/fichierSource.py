@@ -1,6 +1,7 @@
 
 import inspect
 import re
+import hashlib
 from texte import Texte
 from message import *
 
@@ -20,16 +21,16 @@ class FichierSource(object):
         return None
 
     @classmethod
-    def by_path (cls, txt, create=True):
-        key = key_from_path(path)
-        if key in cls.__fichiersSource:
-            return cls.__fichiersSource[key]
+    def by_path (cls, path, create=True):
+        relativ_path = cls.relativ_path(path)
+        if relativ_path in cls.__fichiersSource:
+            return cls.__fichiersSource[relativ_path]
         if create:
-            return cls(key)
+            return cls(relativ_path)
         return None
 
     @classmethod
-    def get_fichiers_source (cls):
+    def fichiers_source (cls):
         fs = cls.__fichiersSource.values()
         return fs
 
@@ -38,8 +39,14 @@ class FichierSource(object):
         FichierSource.__jeedomDir = dir
 
     @staticmethod
-    def key_from_path (path):
-        return path.replace(FichierSource.__jeedomDir + "/", "")
+    def relativ_path (path):
+        return path.replace(FichierSource.__jeedomDir + "/","")
+
+    @staticmethod
+    def absolute_path (path):
+        if path.startswith(FichierSource.__jeedomDir):
+            return path
+        return FichierSource.__jeedomDir + "/" + path
 
     # --- Les méthodes d'intance ---
 
@@ -49,19 +56,27 @@ class FichierSource(object):
         return super().__new__(cls)
 
     def __init__ (self, path):
-        self.__path = path
-        self.__key = self.key_from_path(path)
-        FichierSource.__fichiersSource[self.__key] = self
+        relativ_path = self.relativ_path(path)
+        self.__relativ_path = relativ_path
+        FichierSource.__fichiersSource[relativ_path] = self
         self.__textes = set()
+        self.__textes_precedents = dict()
 
     def __del__ (self):
-        del self.__fichiersSource[self.__key]
+        del self.__fichiersSource[self.__relativ_path]
 
-    def get_key (self):
-        return self.__key
+    def get_absolute_path(self):
+        return self.absolute_path(self.__relativ_path)
+
+    def get_relativ_path(self):
+        return self.__relativ_path
 
     def add_texte(self, txt):
         self.__textes.add(txt)
+
+    def add_texte_precedent(self, texte, traduction, langue):
+        self.__textes_precedents.setdefault(langue,dict())
+        self.__textes_precedents[langue][texte] = traduction
 
     def get_textes(self):
         return self.__textes
@@ -69,7 +84,7 @@ class FichierSource(object):
     def search_textes(self):
         patern___ = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<texte>.*?)(?P=delim))\s*,\s*\S+\s*\)')
         try:
-            with (open(self.__path, "r")) as f:
+            with (open(self.get_absolute_path(), "r")) as f:
                 content = f.read()
         except Exception as ex:
             info = inspect.currentframe()
@@ -82,9 +97,9 @@ class FichierSource(object):
                 Verbose ("        " + txt)
                 self.__textes.add(Texte.by_texte(txt))
             else:
-                Warning (f"ATTENTION, il y a un texte de longueur 0 dans le fichier <{self.__path}>")
+                Warning (f"ATTENTION, il y a un texte de longueur 0 dans le fichier <{self.__relativ_path}>")
 
-        if self.__path[-4:] == ".php":
+        if self.__relativ_path[-4:] == ".php":
             Debug ('        Recherche __("...",__FILE__)\n')
             for match in patern___.finditer(content):
                 texte = match.group('texte')
@@ -93,7 +108,7 @@ class FichierSource(object):
                 Verbose ("        " + texte)
                 if re.search(regex,texte):
                     print ("====  Délimineur de début et fin de chaîne trouvé dans le texte !!!")
-                    print (f"      Fichier: {self.__path}")
+                    print (f"      Fichier: {self.__relativ_path}")
                     print (f"      texte  : {texte}")
                 else:
                     self.__textes.add(Texte.by_texte(texte))
@@ -104,14 +119,10 @@ class FichierSource(object):
 
         result = dict()
         for texte in self.__textes:
-
-            Debug ("\n==========\nfichier: " + self.__path + "\n")
-            Debug ("\n  ".join(dir(self)))
-            Debug ("\n-----------\ntexte: "+ texte.get_texte() + "\n")
-            Debug ("  " + "\n  ".join(dir(texte)) + "\n")
-
-            traduction = texte.get_traduction(langue)
-            result[traduction[0]] = traduction[1]
+            if langue in self.__textes_precedents and texte.get_texte() in self.__textes_precedents[langue]:
+                result[texte.get_texte()] = self.__textes_precedents[langue][texte.get_texte()]
+            else:
+                traduction = texte.get_traduction(langue)
+                result[traduction[0]] = traduction[1]
 
         return result
-

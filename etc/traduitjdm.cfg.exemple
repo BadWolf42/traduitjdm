@@ -2,7 +2,7 @@
 # Fichier de configuration pour "traduitjdm"
 #
 # - Les noms des sections ne sont pas sensibles au majuscules et minuscules
-# - Les paramêtre de type boolean sont True s'ils sont défini à "1", 'o', 'oui',s
+# - Les paramètres de type boolean sont True s'ils sont définis à "1", 'o', 'oui',
 #   'y', 'yes' ou 'true' (insensible à la case) et False dans tous les autres cas.
 
 

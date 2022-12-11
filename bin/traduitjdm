@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-version = "1.0.4"
+version = "1.1"
 
 import argparse
 import getopt
@@ -10,6 +10,7 @@ import texte
 import json
 import glob
 import fnmatch
+import datetime
 from fichierSource import FichierSource
 from texte import Texte
 from message import *
@@ -179,7 +180,7 @@ def options():
     elif args.nobackup:
         backup = False
     elif 'backup' in configs:
-        backup = configs['color']
+        backup = configs['backup']
 
     if args.purge:
         purge = True
@@ -243,17 +244,18 @@ def options():
             sys.exit(1)
 
 
-def plugin_dir():
+def plugin_absolute_path():
     # Le chemin d'accès à la racine du plugin
     return f"{jeedomDir}/plugins/{plugin}"
 
 
 def get_textes_from_source():
     Verbose ("Recherche de textes dans le code...")
-    textesFromPlugin = dict()
-    for root, dirs, files in os.walk(plugin_dir()):
+    for root, dirs, files in os.walk(plugin_absolute_path()):
         for dirname in dirs:
             if dirname[0] == ".":
+                dirs.remove(dirname)
+            if (root.endswith("/core") and dirname == 'i18n'):
                 dirs.remove(dirname)
             for d in excludes:
                 if fnmatch.fnmatch(dirname, d):
@@ -267,34 +269,63 @@ def get_textes_from_source():
               or fileName[-3:] == ".js"
               or fileName[-5:] == ".json"
               or fileName[-5:] == ".html"):
-                Verbose (f"    {root}/{fileName}...")
-                fichier = FichierSource(f"{root}/{fileName}")
+                absolute_path = f"{root}/{fileName}"
+                Verbose (f"    {absolute_path}...")
+                fichier = FichierSource(f"{absolute_path}")
                 fichier.search_textes()
-    return textesFromPlugin
+    return
 
 
 def get_textes_from_precedent():
     Verbose ("Lecture des traductions existantes...")
+    ok = True
     for langue in langues:
         Verbose ("    Langue: " + langue + "...")
         content = None
+        file_path = plugin_absolute_path() + "/core/i18n/" + langue + ".json"
+        if (not os.path.exists (file_path)):
+            return
         try:
-            with open(plugin_dir() + "/core/i18n/" + langue + ".json") as f:
+            with open(plugin_absolute_path() + "/core/i18n/" + langue + ".json") as f:
                 content = f.read()
-        except Exception as ex:
-            Verbose ("        Pas de version précédente à lire!")
+        except OSError as e:
+            Error (e.filename + ": " + e.strerror)
+            ok = False
+            continue
 
         if content != None:
-            data = json.loads(content)
+            try:
+                data = json.loads(content)
+            except json.decoder.JSONDecodeError as e:
+                Error (f"Erreur lors de la lecture du fichier {file_path}:")
+                Error (f"   Ligne {e.lineno}")
+                Error (f"   position {e.colno}")
+                Error (f"   {e.msg}")
+                print ()
+                ok = False
+                continue 
 
-            for fkey in data:
-                fs = FichierSource.by_key(fkey)
-                for texte in data[fkey]:
-                    txt = Texte.by_texte(texte)
-                    if purge and not txt in fs.get_textes():
-                        continue
-                    txt.add_traduction(langue, data[fkey][texte], "precedent", fkey)
-                    fs.add_texte(txt)
+            pre_1_1 = False
+            if not 'traduitjdm' in data.keys():
+                pre_1_1 = True
+            for relativ_path in data:
+                if (relativ_path == 'traduitjdm'):
+                    continue
+                else:
+                    relativ_path = relativ_path.replace("\/","/")
+                    fs = FichierSource.by_path(relativ_path)
+                    for texte in data[relativ_path]:
+                        if pre_1_1 and data[relativ_path][texte] == texte:
+                            data[relativ_path][texte] = '__AT__' + texte
+                        if not data[relativ_path][texte].startswith('__AT__'):
+                            fs.add_texte_precedent(texte, data[relativ_path][texte], langue)
+                        txt = Texte.by_texte(texte)
+                        if purge and not txt in fs.get_textes():
+                            continue
+                        if not data[relativ_path][texte].startswith('__AT__'):
+                            txt.add_traduction(langue, data[relativ_path][texte], "precedent")
+                        fs.add_texte(txt)
+    return ok
 
 
 def get_textes_from_core():
@@ -306,7 +337,7 @@ def get_textes_from_core():
                 with open( jeedomDir + "/core/i18n/" + langue + ".json") as f:
                     content = f.read()
             except Exception as ex:
-                Verbose ("        Erreur lors de la lecture de " + langue + ".json!")
+                Error ("        Erreur lors de la lecture de " + langue + ".json!")
 
             data = json.loads(content)
             for fkey in data:
@@ -321,7 +352,7 @@ def write_traduction( textes ="" ):
     for langue in langues:
         Verbose (f"    Langue: {langue}...")
 
-        fileName = plugin_dir() + "/core/i18n"
+        fileName = plugin_absolute_path() + "/core/i18n"
         if (not os.path.exists (fileName)):
                 os.mkdir(fileName)
         fileName = fileName + "/" + langue + ".json"
@@ -342,10 +373,13 @@ def write_traduction( textes ="" ):
                 os.rename (fileName, fileName + ".bck")
 
         result = dict()
-        for fs in FichierSource.get_fichiers_source():
+        for fs in FichierSource.fichiers_source():
             trad = fs.get_traduction(langue)
             if trad != None:
-                result[fs.get_key()] = trad
+                result[fs.get_relativ_path()] = trad
+        result['traduitjdm']={}
+        result['traduitjdm']['version']=version
+        result['traduitjdm']['timestamp']=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         with open(fileName, "w") as f:
             f.write(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= indent).replace("/","\/"))
@@ -355,6 +389,6 @@ def write_traduction( textes ="" ):
 options()
 FichierSource.set_jeedom_dir(jeedomDir)
 get_textes_from_source()
-get_textes_from_precedent()
+get_textes_from_precedent() or exit(1)
 get_textes_from_core()
 write_traduction();

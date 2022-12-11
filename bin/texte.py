@@ -39,14 +39,11 @@ class Texte(object):
     def __del__ (self):
         del self.__textes[self.__texte]
 
-    def add_traduction (self, langue, traduction, source, fileKey=None):
+    def add_traduction (self, langue, traduction, source):
         self.__traduction.setdefault(langue,dict())
-        if source == "core":
-            self.__traduction[langue].setdefault(source, list())
-            if not traduction in self.__traduction[langue][source]:
-                self.__traduction[langue][source].append(traduction)
-        else:
-            self.__traduction[langue][source] = traduction
+        self.__traduction[langue].setdefault(source,list())
+        if not traduction in self.__traduction[langue][source]:
+            self.__traduction[langue][source].append(traduction)
 
     def select_traduction(self, source, langue):
         choix = self.__traduction[langue][source]
@@ -74,7 +71,7 @@ class Texte(object):
 
         if not langue in self.__traduction:
             # Il n'y a pas de traduction disponible pour cette langue
-            return (self.__texte, traduction)
+            return (self.__texte, '__AT__' + traduction)
 
         OK = False
         for source in self.__priorite:
