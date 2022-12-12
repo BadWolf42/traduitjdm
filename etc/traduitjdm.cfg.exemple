@@ -1,9 +1,9 @@
 
 # Fichier de configuration pour "traduitjdm"
 #
-# - Les noms des sections ne sont pas sensibles au majuscules et minuscules
+# - Les noms des sections ne sont pas sensibles aux majuscules et minuscules
 # - Les paramètres de type boolean sont True s'ils sont définis à "1", 'o', 'oui',
-#   'y', 'yes' ou 'true' (insensible à la case) et False dans tous les autres cas.
+#   'y', 'yes' ou 'true' (insensible à la casse) et False dans tous les autres cas.
 
 
 [global]
@@ -19,7 +19,7 @@ plugin = id_du_plugin
 #-----------------
 # Mode verbose
 #
-# Ce paramêtre sera ignoré si l'option '-v', '--verbose' ou '--noverbose' est indiquée
+# Ce paramètre sera ignoré si l'option '-v', '--verbose' ou '--noverbose' est indiquée
 # dans la ligne de commande
 # type: boolean
 # défaut: False
@@ -27,9 +27,9 @@ plugin = id_du_plugin
 
 #-----------------
 # Couleur
-# Utilisation de couleurs pour l'affichage de messages d'erreur ou de warning
+# Utilisation de couleurs pour l'affichage des messages d'erreur ou de warning
 #
-# Ce paramêtre sera ignoré si l'option '-C', '--color' ou '--nocolor' est indiquée
+# Ce paramètre sera ignoré si l'option '-C', '--color' ou '--nocolor' est indiquée
 # dans la ligne de commande
 # type: boolean
 # défaut: True
@@ -39,7 +39,7 @@ plugin = id_du_plugin
 # Backup
 # Création d'une sauvegarde des anciens fichiers de traduction
 #
-# Ce paramêtre sera ignoré si l'option '-b', '--backup' ou '--nobackup' est indiquée
+# Ce paramètre sera ignoré si l'option '-b', '--backup' ou '--nobackup' est indiquée
 # dans la ligne de commande
 # type: boolean
 # défaut: False
@@ -49,7 +49,7 @@ plugin = id_du_plugin
 # Purge
 # Suppression des anciens textes qui ne sont pas/plus présents dans le code du plugin
 #
-# Ce paramêtre sera ignoré si l'option '-p', '--purge' ou '--nopurge' est indiquée
+# Ce paramètre sera ignoré si l'option '-p', '--purge' ou '--nopurge' est indiquée
 # dans la ligne de commande
 # type: boolean
 # défaut: False
@@ -59,7 +59,7 @@ plugin = id_du_plugin
 # Tabulation
 # Indentation dans les fichiers de traduction pas des talbuations au lieur de quatre " "
 #
-# Ce paramêtre sera ignoré si l'option '-t', '--tab' ou '--notab' est indiquée
+# Ce paramètre sera ignoré si l'option '-t', '--tab' ou '--notab' est indiquée
 # dans la ligne de commande
 # type: boolean
 # défaut: False
@@ -67,8 +67,8 @@ plugin = id_du_plugin
 
 #-----------------
 # répertoire de Jeedom
-# Répertoire dans lequel jedrodom est installé le plugin à traduire sera cherché dans le 
-# sous répertoire plugins
+# Répertoire dans lequel jeedom est installé le plugin à traduire sera cherché dans le 
+# sous répertoire "plugins"
 #
 # Ce paramètre sera ignoré si l'option '-j' ou '--jeeDir' est indiquées dans le ligne de
 # commande
@@ -94,7 +94,7 @@ plugin = id_du_plugin
 # Ce paramètre peut être répété, la liste des répertoires ou fichiers à exclure sera construite en
 # concaténant les répétitions de ce paramètre
 #
-# Comme dans le shell, les caratères spéciaux suivant peuvent êtree utilisés:
+# Comme dans le shell, les caratères spéciaux suivantis peuvent être utilisés:
 # * : reconnaît n'importe quoi
 # ? : reconnaît n'importe quel caractère unique
 # [seq] : reconnaît n'importe quel caractère dans `seq`

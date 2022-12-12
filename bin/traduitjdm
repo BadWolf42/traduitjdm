@@ -49,7 +49,10 @@ def read_cfg(cfg_file_name):
                 value = value.strip()
                 Debug ("    ", key, ":\t", value)
 
-                if key == 'verbose':
+                if key == "plugin":
+                    cfg['plugin'] = value
+
+                elif key == 'verbose':
                     cfg['verbose'] = value.lower() in verite
 
                 elif key in ['color', 'couleur']:
@@ -76,9 +79,6 @@ def read_cfg(cfg_file_name):
                     if not 'excludes' in cfg:
                         cfg['excludes'] = set()
                     cfg['excludes'] = cfg['excludes'].union(set(value.split(",")))
-
-                elif key == "plugin":
-                    cfg['plugin'] = value
     return cfg
 
 def options():
@@ -122,7 +122,7 @@ def options():
 
     backup_group = exec_group.add_mutually_exclusive_group()
     backup_group.add_argument('-b', '--backup', action='store_true', help="Les fichiers existants sont renommés avec l'extension \".bck\"")
-    backup_group.add_argument('--nobackup', action='store_true', help="Pa de suavegarde des fichiers existants")
+    backup_group.add_argument('--nobackup', action='store_true', help="Pas de sauvegarde des fichiers existants")
 
     purge_group = exec_group.add_mutually_exclusive_group()
     purge_group.add_argument('-p', '--purge', action='store_true', help="Retire les textes qui ne sont pas/plus trouvés dans le code")
@@ -130,7 +130,7 @@ def options():
 
     tab_group = exec_group.add_mutually_exclusive_group()
     tab_group.add_argument('-t', '--tab', action='store_true', help="Utilisation de tabulations pour les indentations (sinon, les indentations sont de 4 espaces)")
-    tab_group.add_argument('--notab', action='store_true', help="Les indentations sont de 4 espaces)")
+    tab_group.add_argument('--notab', action='store_true', help="Les indentations sont de 4 espaces")
 
     config_group = exec_group.add_mutually_exclusive_group()
     config_group.add_argument('-c', '--config', metavar="ConfigFile", default=cfgFile, help=f"Fichier de configuration ('{cfgFile}' par défaut)")
